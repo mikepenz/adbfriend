@@ -19,7 +19,7 @@ kotlin {
 
 application {
     mainClass = "com.mikepenz.adbfriend.MainKt"
-    version = "0.0.2"
+    version = "0.0.3"
 }
 
 tasks.named("shadowJar", ShadowJar::class.java) {
