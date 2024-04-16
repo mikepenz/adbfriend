@@ -30,14 +30,19 @@ class Sync : CliktCommand() {
     private val md5Compare: Boolean by option().flag().help("Compare MD5 to check equality")
     private val pushTimeout: Long by option().long().default(5_000L).help("Defines the timeout after how many ms a push should fail without progress")
     private val retryCount: Int by option().int().default(3).help("Defines the amount of retries")
+    private val retryDelay: Long by option().long().default(1_000L).help("Defines the delay after a upload failure occurred")
     private val failOnError: Boolean by option().flag().help("Defines if the action shall fatally fail if a single file fails to push")
+    private val hideUp2date: Boolean by option().flag().help("When enabled, will hide any entries which are already up2date.")
     private val config by requireObject<Config>()
 
     private lateinit var adb: AndroidDebugBridgeClient
 
     override fun run() = runBlocking {
         try {
-            val localFile = File(localPath)
+            val cleanedRemotePath = remotePath.removeSuffix(File.separator)
+            val cleanedLocalPath = localPath.removeSuffix(File.separator)
+
+            val localFile = File(cleanedLocalPath)
             require(localFile.exists()) { "The local file does not exist." }
 
             StartAdbInteractor().execute() //Start the adb server
@@ -54,15 +59,25 @@ class Sync : CliktCommand() {
                 exitProcess(1)
             }
 
+            echo()
+            echo("ℹ\uFE0F Copying from $localPath > $remotePath")
+            echo()
+
             // filter to devices as defined by input
             val serialFilter = config.serials
             val filteredDevices = if (serialFilter?.isNotEmpty() == true) {
                 devices.filter { serialFilter.contains(it.serial) }
             } else devices
 
-            compare(filteredDevices, remotePath, localFile)
+            val success = compare(filteredDevices, cleanedRemotePath, localFile)
 
-            echo("✨ Done                        ")
+            echo("                                            ")
+
+            if (success) {
+                echo("✨ Completed Successfully")
+            } else {
+                echo("⚠\uFE0F Completed with a warning")
+            }
 
             exitProcess(0)
         } catch (t: Throwable) {
@@ -72,31 +87,37 @@ class Sync : CliktCommand() {
     }
 
 
-    private suspend fun compare(devices: List<Device>, remote: String, local: File) {
+    private suspend fun compare(devices: List<Device>, remote: String, local: File): Boolean {
         if (excludes.contains(local.name)) {
             echo("⁉\uFE0F Exclude rule, excludes the root folder")
-            return
+            return false
         }
 
+        var allSuccessful = true
         val localFiles = local.mapped()
         devices.forEach { device ->
-            device.compare(local.name, remote, localFiles, 1)
+            val result = device.compare(local.name, remote, localFiles, 1)
+            allSuccessful = allSuccessful && result
         }
+        return allSuccessful
     }
 
-    private suspend fun Device.compare(name: String, remote: String, localFiles: Map<String, File>, level: Int, prefix: String = "") {
+    private suspend fun Device.compare(name: String, remote: String, localFiles: Map<String, File>, level: Int, prefix: String = ""): Boolean {
+        var allSuccessful = true
         val device = this
         val remoteFiles = adb.execute(ListFileRequest(remote, listOf(Feature.LS_V2, Feature.STAT_V2)), device.serial)
             .filter { it.name != null }
             .associateBy { it.name!! }
 
-        echo("$prefix$name")
-        val levelInset = "  "
+        echo("$prefix\uD83D\uDDC4\uFE0F $name")
+
+        // val directChild = prefix + PARENT + DIRECT
+        val indirectChild = prefix.replace(DIRECT, INDIRECT) + PARENT + DIRECT
 
         localFiles.onEach { (localName, localFile) ->
-            val fullRemotePath = remote + File.separatorChar + localName.replace("$", "\$")
-            if (localFile.isDirectory) {
-                device.compare(localFile.name, fullRemotePath, localFile.mapped(), level + 1, levelInset)
+            val fullRemotePath = remote join localName.replace("$", "\$")
+            val result = if (localFile.isDirectory) {
+                device.compare(localFile.name, fullRemotePath, localFile.mapped(), level + 1, indirectChild)
             } else if (remoteFiles.containsKey(localName)) {
                 val localSize = localFile.length()
                 val remoteFile = remoteFiles[localName]!!
@@ -104,42 +125,44 @@ class Sync : CliktCommand() {
 
                 // is there remote, identify if it needs an update
                 if (localSize != remoteSize) {
-                    echo("$prefix$levelInset⬆\uFE0F $localName :: File was modified. Pushing it")
-                    device.pushFile(localFile, fullRemotePath)
+                    echo("$indirectChild\uD83D\uDCC1⬆\uFE0F $localName :: File was modified. Pushing it")
+                    device.pushFile(localFile, fullRemotePath, indirectChild)
                 } else {
                     if (md5Compare && !device.compareMd5(localFile, fullRemotePath)) {
-                        echo("$prefix$levelInset⬆\uFE0F $localName :: File was modified. Pushing it")
-                        device.pushFile(localFile, fullRemotePath)
+                        echo("$indirectChild\uD83D\uDCC1⬆\uFE0F $localName :: File was modified. Pushing it")
+                        device.pushFile(localFile, fullRemotePath, indirectChild)
                     } else {
-                        echo("$prefix$levelInset✅ $localName :: File is up to date.")
+                        if (!hideUp2date) echo("$indirectChild\uD83D\uDCC1✅ $localName :: File is up to date.")
+                        true
                     }
                 }
             } else {
-                echo("$prefix$levelInset\uD83C\uDD95 $localName :: File was missing. Pushing update.")
-                device.pushFile(localFile, fullRemotePath)
+                echo("$indirectChild\uD83D\uDCC1\uD83C\uDD95 $localName :: File was missing. Pushing update.")
+                device.pushFile(localFile, fullRemotePath, indirectChild)
             }
+            allSuccessful = allSuccessful && result
         }
         remoteFiles.onEach { (name, _) ->
-            val fullRemotePath = remote + File.separatorChar + name
+            val fullRemotePath = remote join name
             if (!excludes.contains(name) && !localFiles.containsKey(name)) {
                 // file remote, but not local, remove...
                 if (deleteMissing) {
-                    echo("$prefix$levelInset\uD83D\uDDD1\uFE0F $name :: exists only remote. Deleting.")
+                    echo("$indirectChild\uD83D\uDCC1\uD83D\uDDD1\uFE0F $name :: exists only remote. Deleting.")
                     device.deleteFile(fullRemotePath)
                 } else {
-                    echo("$prefix$levelInset$name :: exists only remote")
+                    echo("$indirectChild\uD83D\uDCC1$name :: exists only remote")
                 }
             }
         }
-
+        return allSuccessful
     }
 
-    private fun Device.pushFile(localFile: File, remote: String): Unit = runBlocking {
-        if (config.dryRun) return@runBlocking
+    private fun Device.pushFile(localFile: File, remote: String, prepandLog: String): Boolean = runBlocking {
+        if (config.dryRun) return@runBlocking true
         val device = this@pushFile
         var attempt = 0
         try {
-            retry(retryCount, 1_000L, preRetry = {
+            retry(retryCount, retryDelay, preRetry = {
                 adb.close() // if we failed try to redo adb
                 adb = AndroidDebugBridgeClientFactory().build()
             }) {
@@ -163,18 +186,20 @@ class Sync : CliktCommand() {
                     var percentage: Int
                     for (percentageDouble in channel) {
                         percentage = (percentageDouble * 100).roundToInt()
-                        terminal.rawPrint("\rPushing: $percentage%")
+                        if (config.progress) terminal.rawPrint("\r${prepandLog}Pushing: $percentage%")
                         reset()
                     }
-                    terminal.rawPrint("\r")
-                    true
+                    if (config.progress) terminal.rawPrint("\r")
                 }
                 if (result == null) throw Exception("Failed while pushing in attempt $attempt")
             }
+            return@runBlocking true
         } catch (t: Throwable) {
-            terminal.rawPrint("\r-- ❌ Timed out $attempt times while pushing $remote (Reason: ${t.message}\n")
+            terminal.rawPrint("${if (config.progress) "\r" else ""}${prepandLog}${INDIRECT}❌ Timed out $attempt times while pushing $remote (Reason: ${t.message}\n")
             if (failOnError) {
                 throw t
+            } else {
+                return@runBlocking false
             }
         }
     }
@@ -199,4 +224,12 @@ class Sync : CliktCommand() {
     }
 
     private fun File.mapped() = (listFiles() ?: emptyArray()).filterNot { excludes.contains(it.name) }.associateBy { it.name }
+
+    private infix fun String.join(second: String) = this + File.separatorChar + second
+
+    companion object {
+        private const val DIRECT = "--"
+        private const val INDIRECT = "  "
+        private const val PARENT = '|'
+    }
 }
