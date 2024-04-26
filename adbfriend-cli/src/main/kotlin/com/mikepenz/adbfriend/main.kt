@@ -12,7 +12,7 @@ class AdbFriend : CliktCommand() {
     private val serials: List<String>? by option().split(";").help("The serial(s) of devices to sync to. Delimited by `;`.")
 
     init {
-        versionOption("0.0.3")
+        versionOption("0.0.4")
     }
 
     override fun run() {
