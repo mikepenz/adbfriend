@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "adbfriend-cli"
-          path: adbfriend-cli/build/install/distributions/*
+          path: adbfriend-cli/build/distributions/
 
       - name: Build Changelog
         id: github_release
