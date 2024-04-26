@@ -42,41 +42,60 @@ class Test : AdbCommand() {
                 resetAutoFillConfirmed = true
             }
 
+            var completeSuccess = true
             devices.onEach { device ->
                 echo("\uD83D\uDCF1 Execute sync for ${device.serial}")
 
+                var success = true
                 animationFlags.onEach { flag ->
                     adb.execute(
                         request = ShellCommandRequest("settings put global $flag $targetScale"), serial = device.serial
-                    )
+                    ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
+                        success = false
+                        completeSuccess = false
+                        echo("  ⚠\uFE0F Failed to set the flag: $flag ($it)")
+                    }
                 }
-                echo("  ✅ Animation flags applied.")
+                if (success) echo("  ✅ Animation flags applied.")
 
                 if (touches) {
                     adb.execute(
                         request = ShellCommandRequest("settings put system $touchesFlag $targetTouchMode"), serial = device.serial
-                    )
-                    echo("  ✅ Touches enabled.")
+                    ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
+                        completeSuccess = false
+                        echo("  ⚠\uFE0F Failed to enable touches ($it)")
+                    } ?: echo("  ✅ Touches enabled.")
+
                 }
 
                 if (configure && immersiveMode) {
                     adb.execute(
                         request = ShellCommandRequest("settings put secure immersive_mode_confirmation confirmed"), serial = device.serial
-                    )
-                    echo("  ✅ Immersive mode `confirmed`.")
+                    ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
+                        completeSuccess = false
+                        echo("  ⚠\uFE0F Failed to set immersive mode ($it)")
+                    } ?: echo("  ✅ Immersive mode `confirmed`.")
                 }
 
                 if (configure && resetAutoFillConfirmed) {
                     val result = adb.execute(
-                        request = ShellCommandRequest("settings get secure autofill_service "), serial = device.serial
-                    ).output.lines().firstOrNull() ?: ""
-                    echo("  ℹ\uFE0F `autofill_service` was set to: `$result`.")
-                    echo("      Re-enable manually: `adb shell settings put secure autofill_service $result`")
-
-                    adb.execute(
-                        request = ShellCommandRequest("settings put secure autofill_service null"), serial = device.serial
+                        request = ShellCommandRequest("settings get secure autofill_service"), serial = device.serial
                     )
-                    echo("  ✅ `auto_fill` service set to `null`.")
+
+                    if (result.errorOutput.trim().isNotBlank()) {
+                        echo("  ⚠\uFE0F Failed to retrieve the current `autofill_service` value. (${result.errorOutput.trim()})")
+                    } else {
+                        val response = result.output.trim()
+                        echo("  ℹ\uFE0F `autofill_service` was set to: `$response`.")
+                        echo("      Re-enable manually: `adb shell settings put secure autofill_service $response`")
+
+                        adb.execute(
+                            request = ShellCommandRequest("settings put secure autofill_service null"), serial = device.serial
+                        ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
+                            completeSuccess = false
+                            echo("  ⚠\uFE0F Failed to set `auto_fill` mode ($it)")
+                        } ?: echo("  ✅ `auto_fill` service set to `null`.")
+                    }
                 }
 
                 if (unlock) {
@@ -86,7 +105,11 @@ class Test : AdbCommand() {
             }
 
             echo()
-            echo("✨ Completed Successfully")
+            if (completeSuccess) {
+                echo("✨ Completed Successfully")
+            } else {
+                echo("⚠\uFE0F Completed with a warning")
+            }
             exitProcess(0)
         } catch (t: Throwable) {
             echo("⁉\uFE0F Could not complete requested test operations: ${t.message}")
