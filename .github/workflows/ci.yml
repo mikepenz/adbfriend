@@ -8,78 +8,6 @@ on:
   pull_request:
 
 jobs:
-  publish_archives:
-    name: Publish Archives
-    if: startsWith(github.ref, 'refs/tags/')
-
-    strategy:
-      matrix:
-        os: [ macos-14 ]
-
-    runs-on: ${{matrix.os}}
-
-    steps:
-      - name: Checkout the repo
-        uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: |
-            11
-            15
-            17
-
-      - name: Copy CI gradle.properties
-        run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Cache konan
-        uses: actions/cache@v4
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: Publish the macOS artifacts
-        if: matrix.os == 'macos-14'
-        env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.NEXUS_USERNAME }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.NEXUS_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-        run: |
-          ./gradlew hypnoticcanvas:publishAllPublicationsToMavenCentralRepository -x test -x lint --no-daemon --no-configure-on-demand --no-parallel --no-configuration-cache
-          ./gradlew hypnoticcanvas-shaders:publishAllPublicationsToMavenCentralRepository -x test -x lint --no-daemon --no-configure-on-demand --no-parallel --no-configuration-cache
-
-      - name: Publish the windows artifact
-        if: matrix.os == 'windows-latest'
-        env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.NEXUS_USERNAME }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.NEXUS_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-        run: |
-          ./gradlew hypnoticcanvas:publishMingwX64PublicationToMavenCentralRepository --no-daemon --no-configure-on-demand --no-parallel --no-configuration-cache
-          ./gradlew hypnoticcanvas-shaders:publishMingwX64PublicationToMavenCentralRepository -x test -x lint --no-configure-on-demand --no-parallel --no-configuration-cache
-
-      - name: Publish the linux artifact
-        if: matrix.os == 'ubuntu-latest'
-        env:
-          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.NEXUS_USERNAME }}
-          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.NEXUS_PASSWORD }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
-          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_PASSWORD }}
-        run: |
-          ./gradlew hypnoticcanvas:publishLinuxX64PublicationToMavenCentralRepository --no-daemon --no-configure-on-demand --no-parallel --no-configuration-cache
-          ./gradlew hypnoticcanvas-shaders:publishLinuxX64PublicationToMavenCentralRepository -x test -x lint --no-configure-on-demand --no-parallel --no-configuration-cache
-
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -97,7 +25,7 @@ jobs:
             17
 
       - name: Validate gradle wrapper
-        uses: gradle/wrapper-validation-action@v2
+        uses: gradle/actions/wrapper-validation@v3
 
       - name: Copy CI gradle.properties
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
@@ -105,40 +33,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build Debug
-        run: ./gradlew sample:assembleDebug
-
-      - name: Run Lint
-        if: github.event_name  == 'pull_request'
-        run: ./gradlew lintDebug
-
-      - name: Prepare Keystore and Local.
-        if: false && startsWith(github.ref, 'refs/tags/')
-        run: |
-          echo "${{ secrets.KEYSTORE }}" > opensource.jks.asc
-          gpg -d --passphrase "${{ secrets.KEYSTORE_PASSPHRASE }}" --batch "opensource.jks.asc" > "app/opensource.jks"
-          echo "${{ secrets.SIGNING_GRADLE }}" > signing.gradle.asc
-          gpg -d --passphrase "${{ secrets.KEYSTORE_PASSPHRASE }}" --batch "signing.gradle.asc" > "app/signing.gradle"
-          echo "openSource.signing.file=signing.gradle" >> local.properties
-
-      - name: Build Release App
-        if: false && startsWith(github.ref, 'refs/tags/')
-        run: ./gradlew sample:assembleRelease sample:bundleRelease
-
-      - name: Collect artifacts
-        if: false
-        run: |
-          COLLECT_PWD=${PWD}
-          mkdir -p "artifacts"
-          find . -name "*-release.apk" -type f -exec cp {} "artifacts" \;
-          find . -name "*-release.aab" -type f -exec cp {} "artifacts" \;
+      - name: Build CLI tool
+        run: ./gradlew adbfriend-cli:shadowDistZip
 
       - name: Archive Artifacts
         uses: actions/upload-artifact@v4
-        if: false
         with:
-          name: "App-Artifacts"
-          path: artifacts/*
+          name: "adbfriend-cli"
+          path: adbfriend-cli/build/install/distributions/*
 
       - name: Build Changelog
         id: github_release
