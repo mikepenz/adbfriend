@@ -1,18 +1,12 @@
 package com.mikepenz.adbfriend
 
-import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.requireObject
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.long
-import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.AndroidDebugBridgeClientFactory
-import com.malinskiy.adam.interactor.StartAdbInteractor
 import com.malinskiy.adam.request.Feature
 import com.malinskiy.adam.request.device.Device
-import com.malinskiy.adam.request.device.ListDevicesRequest
-import com.malinskiy.adam.request.misc.GetAdbServerVersionRequest
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
 import com.malinskiy.adam.request.shell.v2.ShellCommandResult
 import com.malinskiy.adam.request.sync.v2.ListFileRequest
@@ -22,7 +16,7 @@ import java.io.File
 import kotlin.math.roundToInt
 import kotlin.system.exitProcess
 
-class Sync : CliktCommand() {
+class Sync : AdbCommand() {
     private val remotePath: String by option().required().help("The Remote Path of where to sync the data")
     private val localPath: String by option().required().help("The Local path of data to sync to the phone")
     private val excludes: List<String> by option().split(";").default(listOf(".DS_Store", ".git", ".lfs")).help("Excluded files or folders, delimited by `;`")
@@ -33,11 +27,8 @@ class Sync : CliktCommand() {
     private val retryDelay: Long by option().long().default(1_000L).help("Defines the delay after a upload failure occurred")
     private val failOnError: Boolean by option().flag().help("Defines if the action shall fatally fail if a single file fails to push")
     private val hideUp2date: Boolean by option().flag().help("When enabled, will hide any entries which are already up2date.")
-    private val config by requireObject<Config>()
 
-    private lateinit var adb: AndroidDebugBridgeClient
-
-    override fun run() = runBlocking {
+    override suspend fun runWithAdb(devices: List<Device>) {
         try {
             val cleanedRemotePath = remotePath.removeSuffix(File.separator)
             val cleanedLocalPath = localPath.removeSuffix(File.separator)
@@ -45,31 +36,11 @@ class Sync : CliktCommand() {
             val localFile = File(cleanedLocalPath)
             require(localFile.exists()) { "The local file does not exist." }
 
-            StartAdbInteractor().execute() //Start the adb server
-            adb = AndroidDebugBridgeClientFactory().build() // Create adb client
-
-            // Get ADB Version
-            val version: Int = adb.execute(request = GetAdbServerVersionRequest())
-            echo("ℹ\uFE0F This machine uses ADB with version: $version")
-
-            // Get all devices
-            val devices: List<Device> = adb.execute(request = ListDevicesRequest())
-            if (devices.isEmpty()) {
-                echo("⚠\uFE0F Didn't detect active devices connected via ADB")
-                exitProcess(1)
-            }
-
             echo()
-            echo("ℹ\uFE0F Copying from $localPath > $remotePath")
+            echo("ℹ\uFE0F Copying from $cleanedLocalPath > $cleanedRemotePath")
             echo()
 
-            // filter to devices as defined by input
-            val serialFilter = config.serials
-            val filteredDevices = if (serialFilter?.isNotEmpty() == true) {
-                devices.filter { serialFilter.contains(it.serial) }
-            } else devices
-
-            val success = compare(filteredDevices, cleanedRemotePath, localFile)
+            val success = compare(devices, cleanedRemotePath, localFile)
 
             echo("                                            ")
 
@@ -93,10 +64,13 @@ class Sync : CliktCommand() {
             return false
         }
 
+
         var allSuccessful = true
         val localFiles = local.mapped()
         devices.forEach { device ->
-            val result = device.compare(local.name, remote, localFiles, 1)
+            echo("\uD83D\uDCF1 Execute sync for ${device.serial}")
+
+            val result = device.compare(local.name, remote, localFiles, 1, "  ")
             allSuccessful = allSuccessful && result
         }
         return allSuccessful
