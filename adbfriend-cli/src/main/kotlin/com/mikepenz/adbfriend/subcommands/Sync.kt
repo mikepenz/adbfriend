@@ -1,4 +1,4 @@
-package com.mikepenz.adbfriend
+package com.mikepenz.adbfriend.subcommands
 
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.*
@@ -11,6 +11,7 @@ import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
 import com.malinskiy.adam.request.shell.v2.ShellCommandResult
 import com.malinskiy.adam.request.sync.v2.ListFileRequest
 import com.malinskiy.adam.request.sync.v2.PushFileRequest
+import com.mikepenz.adbfriend.*
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import kotlin.math.roundToInt

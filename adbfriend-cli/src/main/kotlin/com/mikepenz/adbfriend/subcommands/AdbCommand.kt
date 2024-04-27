@@ -1,4 +1,4 @@
-package com.mikepenz.adbfriend
+package com.mikepenz.adbfriend.subcommands
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.requireObject
@@ -8,6 +8,7 @@ import com.malinskiy.adam.interactor.StartAdbInteractor
 import com.malinskiy.adam.request.device.Device
 import com.malinskiy.adam.request.device.ListDevicesRequest
 import com.malinskiy.adam.request.misc.GetAdbServerVersionRequest
+import com.mikepenz.adbfriend.Config
 import kotlinx.coroutines.runBlocking
 import kotlin.system.exitProcess
 
@@ -20,7 +21,12 @@ abstract class AdbCommand : CliktCommand() {
     protected lateinit var adb: AndroidDebugBridgeClient
 
     override fun run() = runBlocking {
-        StartAdbInteractor().execute() //Start the adb server
+        val successful = StartAdbInteractor().execute() //Start the adb server
+        if (!successful) {
+            echo("⚠\uFE0F Failed to detect the `adb` binary. Ensure your path is properly configured.")
+            exitProcess(1)
+        }
+
         adb = AndroidDebugBridgeClientFactory().build() // Create adb client
 
         try {

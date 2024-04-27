@@ -1,4 +1,4 @@
-package com.mikepenz.adbfriend
+package com.mikepenz.adbfriend.subcommands
 
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.flag

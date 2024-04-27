@@ -1,4 +1,4 @@
-package com.mikepenz.adbfriend
+package com.mikepenz.adbfriend.subcommands
 
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
@@ -10,7 +10,7 @@ import com.mikepenz.adbfriend.utils.packageParser
 import kotlin.system.exitProcess
 
 abstract class AdbPackagesCommand(private val action: String) : AdbCommand() {
-    protected val packagesGlob: String by option("--packages", metavar = "glob").required().help("Provide the package or package glob of apps to uninstall.")
+    protected val packagesGlob: String by option("--packages", metavar = "glob").required().help("Provide the filter to fetch the package or package glob of apps to uninstall.")
     protected var completeSuccess = true
     override suspend fun runWithAdb(devices: List<Device>) {
         try {

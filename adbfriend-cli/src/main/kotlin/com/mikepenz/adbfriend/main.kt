@@ -3,6 +3,10 @@ package com.mikepenz.adbfriend
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.*
+import com.mikepenz.adbfriend.subcommands.Packages
+import com.mikepenz.adbfriend.subcommands.Sync
+import com.mikepenz.adbfriend.subcommands.Test
+import com.mikepenz.adbfriend.subcommands.Uninstall
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -23,4 +27,4 @@ class AdbFriend : CliktCommand() {
     }
 }
 
-fun main(args: Array<String>) = AdbFriend().subcommands(Sync(), Test(), Uninstall()).main(args)
+fun main(args: Array<String>) = AdbFriend().subcommands(Sync(), Test(), Uninstall(), Packages()).main(args)
