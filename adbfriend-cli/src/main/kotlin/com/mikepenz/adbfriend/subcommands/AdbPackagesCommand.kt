@@ -1,4 +1,4 @@
-package com.mikepenz.adbfriend
+package com.mikepenz.adbfriend.subcommands
 
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option

@@ -1,6 +1,6 @@
 package com.mikepenz.adbfriend.utils
 
-import com.mikepenz.adbfriend.Package
+import com.mikepenz.adbfriend.subcommands.Package
 
 private const val PACKAGES = "Packages:"
 private const val COMMON_START = " "
