@@ -1,116 +1,43 @@
 package com.mikepenz.adbfriend
 
+import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.mordant.terminal.YesNoPrompt
 import com.malinskiy.adam.request.device.Device
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
 import kotlin.system.exitProcess
 
-class Uninstall : AdbCommand() {
+class Uninstall : AdbPackagesCommand("uninstall") {
+    private val keepData: Boolean by option().flag().help("Will keep the data when uninstalling. By default will also remove data.")
     private val force: Boolean by option().flag().help("Skips all warning prompts, and applies settings without confirmation.")
 
-    override suspend fun runWithAdb(devices: List<Device>) {
-        try {
-            devices.onEach { device ->
-                echo("\uD83D\uDCF1 Execute uninstall for ${device.serial}")
-
-
-                val response = adb.execute(request = ShellCommandRequest("dumpsys package packages"), serial = device.serial)
-
-                val packages = packageParser(response.output)
-                packages.onEach {
-                    echo("  ${it.packageName} - ${it.versionName}")
-                }
-
-            }
-
-            echo()
-            echo("✨ Completed Successfully")
-            exitProcess(0)
-        } catch (t: Throwable) {
-            echo("⁉\uFE0F Failed to uninstall: ${t.message}")
+    override suspend fun runForPackages(device: Device, packages: List<Package>) {
+        // ensure the person wants to install all
+        if (!force && YesNoPrompt("ℹ\uFE0F Are you sure you want to uninstall the listed applications?", terminal, default = false).ask() != true) {
+            echo("No app uninstalled.")
             exitProcess(1)
         }
-    }
 
-
-    private fun packageParser(packageString: String): List<Package> {
-        val collectedPackages: MutableList<Package> = mutableListOf()
-        var inPackages = true
-        var currentPackage: String? = null
-        val currentPackageDetails: MutableMap<String, String> = mutableMapOf()
-
-        for (line in packageString.lineSequence()) {
-            if (line.startsWith(PACKAGES, true)) {
-                inPackages = true
-                continue
-            } else if (!line.startsWith(COMMON_START, true)) {
-                inPackages = false
-            }
-
-            if (inPackages) {
-                val trimmedLine = line.trim()
-                if (trimmedLine.startsWith(PACKAGE, true)) {
-                    // new package, check if we had everything for the prior, reset
-                    if (currentPackage != null && currentPackageDetails.isNotEmpty()) {
-                        if (currentPackageDetails.size == PACKAGE_DETAILS.size) {
-                            // got all details
-                            collectedPackages.add(
-                                Package(
-                                    currentPackage,
-                                    currentPackageDetails[PACKAGE_VERSION_NAME]!!,
-                                    currentPackageDetails[PACKAGE_DATA_DIR]!!
-                                )
-                            )
-                        } else {
-                            echo("  ⚠\uFE0F Not all details found for $currentPackage")
-                        }
-                        currentPackageDetails.clear()
-                    }
-
-                    // identify the current package we are reading
-                    val parts = trimmedLine.substring(PACKAGE.length).split("]")
-                    if (parts.size == 2) {
-                        currentPackage = parts[0]
-                    } else {
-                        // warning
-                        echo("  ⚠\uFE0F Found non expected package start ($trimmedLine)")
-                    }
-                } else if (trimmedLine.isBlank()) {
-                    currentPackage = null // no longer in a package
-                    currentPackageDetails.clear()
-                } else if (currentPackage != null) {
-                    for (detail in PACKAGE_DETAILS) {
-                        if (trimmedLine.startsWith(detail, true)) {
-                            currentPackageDetails[detail] = trimmedLine.substring(detail.length)
-                        }
-                    }
-                } else {
-                    // we don't require this information at this time
+        var success = true
+        packages.onEach { p ->
+            val cmd = StringBuilder().apply {
+                append("pm uninstall ")
+                if (keepData) {
+                    append("-k ")
                 }
-            } else {
-                continue
+                append(p.packageName)
+            }.toString()
+
+            adb.execute(
+                request = ShellCommandRequest(cmd), serial = device.serial
+            ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
+                success = false
+                completeSuccess = false
+                echo("  ⚠\uFE0F Failed to uninstall: ${p.packageName} ($it)")
             }
         }
-
-        return collectedPackages
-    }
-
-    data class Package(
-        val packageName: String,
-        val versionName: String,
-        val dataDir: String,
-    )
-
-    companion object {
-        private const val PACKAGES = "Packages:"
-        private const val COMMON_START = " "
-        private const val PACKAGE = "Package ["
-        private const val PACKAGE_VERSION_NAME = "versionName="
-        private const val PACKAGE_DATA_DIR = "dataDir="
-        private const val PACKAGE_LAST_UPDATE = "lastUpdateTime="
-        private const val PACKAGE_FIRST_INSTALL = "firstInstallTime="
-        private val PACKAGE_DETAILS = arrayOf(PACKAGE_VERSION_NAME, PACKAGE_DATA_DIR, PACKAGE_LAST_UPDATE, PACKAGE_FIRST_INSTALL)
+        if (success) echo("  ✅ Uninstalled successfully for ${device.serial}")
     }
 }
