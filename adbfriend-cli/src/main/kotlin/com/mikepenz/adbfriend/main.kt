@@ -19,7 +19,7 @@ class AdbFriend : CliktCommand() {
 
     init {
         Logger.getLogger("io.netty").setLevel(Level.OFF)
-        versionOption("0.0.4")
+        versionOption("0.1.0")
     }
 
     override fun run() {
