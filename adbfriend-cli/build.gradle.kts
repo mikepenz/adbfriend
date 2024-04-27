@@ -11,6 +11,7 @@ kotlin {
         dependencies {
             implementation(projects.shared)
             implementation("com.github.ajalt.clikt:clikt:4.3.0")
+            implementation("org.slf4j:slf4j-nop:2.0.6")
             implementation(libs.aboutlibraries.core) // aboutlibraries
         }
     }
@@ -23,5 +24,7 @@ application {
 }
 
 tasks.named("shadowJar", ShadowJar::class.java) {
-    minimize()
+    minimize {
+        exclude(dependency("org.slf4j:.*:.*"))
+    }
 }

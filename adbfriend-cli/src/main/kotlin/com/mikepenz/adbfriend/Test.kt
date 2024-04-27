@@ -37,7 +37,7 @@ class Test : AdbCommand() {
             var resetAutoFillConfirmed = false
             if (force && resetAutofill) {
                 resetAutoFillConfirmed = resetAutofill
-            } else if (configure && resetAutofill && YesNoPrompt("ℹ\uFE0F Are you sure you want to reset the autofill service?", terminal).ask() == true) {
+            } else if (configure && resetAutofill && YesNoPrompt("ℹ\uFE0F Are you sure you want to reset the autofill service?", terminal, default = false).ask() == true) {
                 echo("⚠\uFE0F Will reset auto_fill service for devices!")
                 resetAutoFillConfirmed = true
             }

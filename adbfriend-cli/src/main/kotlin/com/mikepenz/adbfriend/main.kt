@@ -3,6 +3,8 @@ package com.mikepenz.adbfriend
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.*
+import java.util.logging.Level
+import java.util.logging.Logger
 
 class Config(val dryRun: Boolean, val progress: Boolean, val serials: List<String>?)
 
@@ -12,6 +14,7 @@ class AdbFriend : CliktCommand() {
     private val serials: List<String>? by option().split(";").help("The serial(s) of devices to sync to. Delimited by `;`.")
 
     init {
+        Logger.getLogger("io.netty").setLevel(Level.OFF)
         versionOption("0.0.4")
     }
 
@@ -20,4 +23,4 @@ class AdbFriend : CliktCommand() {
     }
 }
 
-fun main(args: Array<String>) = AdbFriend().subcommands(Sync(), Test()).main(args)
+fun main(args: Array<String>) = AdbFriend().subcommands(Sync(), Test(), Uninstall()).main(args)
