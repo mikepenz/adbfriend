@@ -18,7 +18,9 @@ kotlin {
             implementation(libs.aboutlibraries.core) // aboutlibraries
 
             implementation(compose.runtime) { require(true) }
-            implementation(compose.components.resources)
+            implementation(compose.components.resources) {
+                exclude("org.jetbrains.compose.foundation")
+            }
         }
     }
 }
