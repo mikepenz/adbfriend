@@ -1,28 +1,8 @@
 {
   "metadata": {
-    "generated": "2024-05-01T09:04:56.527Z"
+    "generated": "2024-05-01T09:41:46.549Z"
   },
   "libraries": [
-    {
-      "uniqueId": "androidx.annotation:annotation",
-      "funding": [],
-      "developers": [
-        {
-          "name": "The Android Open Source Project"
-        }
-      ],
-      "artifactVersion": "1.1.0",
-      "description": "The Support Library is a static library that you can add to your Android application in order to use APIs that are either not available for older platform versions or utility APIs that aren't a part of the framework APIs.",
-      "scm": {
-        "connection": "scm:git:https://android.googlesource.com/platform/frameworks/support",
-        "url": "http://source.android.com"
-      },
-      "name": "Support Annotations",
-      "website": "http://developer.android.com/tools/extras/support-library.html",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
     {
       "uniqueId": "androidx.annotation:annotation-jvm",
       "funding": [],
@@ -227,6 +207,69 @@
       }
     },
     {
+      "uniqueId": "com.github.ajalt.clikt:clikt-jvm",
+      "funding": [],
+      "developers": [
+        {
+          "name": "AJ Alt"
+        }
+      ],
+      "artifactVersion": "4.4.0",
+      "description": "Multiplatform command line interface parsing for Kotlin",
+      "scm": {
+        "connection": "scm:git:git://github.com/ajalt/clikt.git",
+        "url": "https://github.com/ajalt/clikt/",
+        "developerConnection": "scm:git:ssh://git@github.com/ajalt/clikt.git"
+      },
+      "name": "Clikt",
+      "website": "https://github.com/ajalt/clikt/",
+      "licenses": [
+        "Apache-2.0"
+      ]
+    },
+    {
+      "uniqueId": "com.github.ajalt.colormath:colormath-jvm",
+      "funding": [],
+      "developers": [
+        {
+          "name": "AJ Alt"
+        }
+      ],
+      "artifactVersion": "3.5.0",
+      "description": "Multiplatform color space conversions for Kotlin",
+      "scm": {
+        "connection": "scm:git:git://github.com/ajalt/colormath.git",
+        "url": "https://github.com/ajalt/colormath/",
+        "developerConnection": "scm:git:ssh://git@github.com/ajalt/colormath.git"
+      },
+      "name": "Colormath",
+      "website": "https://github.com/ajalt/colormath/",
+      "licenses": [
+        "MIT"
+      ]
+    },
+    {
+      "uniqueId": "com.github.ajalt.mordant:mordant-jvm",
+      "funding": [],
+      "developers": [
+        {
+          "name": "AJ Alt"
+        }
+      ],
+      "artifactVersion": "2.5.0",
+      "description": "Colorful multiplatform styling Kotlin for command-line applications",
+      "scm": {
+        "connection": "scm:git:git://github.com/ajalt/mordant.git",
+        "url": "https://github.com/ajalt/",
+        "developerConnection": "scm:git:ssh://git@github.com/ajalt/mordant.git"
+      },
+      "name": "Mordant",
+      "website": "https://github.com/ajalt/mordant/",
+      "licenses": [
+        "Apache-2.0"
+      ]
+    },
+    {
       "uniqueId": "com.google.android:annotations",
       "funding": [],
       "developers": [
@@ -407,27 +450,6 @@
       ]
     },
     {
-      "uniqueId": "com.mikepenz:aboutlibraries-compose-m3-jvm",
-      "funding": [],
-      "developers": [
-        {
-          "name": "Mike Penz"
-        }
-      ],
-      "artifactVersion": "11.1.0",
-      "description": "AboutLibraries automatically detects all dependencies of a project and collects their information including the license. Optionally visualising it via the provided ui components.",
-      "scm": {
-        "connection": "scm:git@github.com:mikepenz/AboutLibraries.git",
-        "url": "https://github.com/mikepenz/AboutLibraries",
-        "developerConnection": "scm:git@github.com:mikepenz/AboutLibraries.git"
-      },
-      "name": "AboutLibraries Compose Material 3 Library",
-      "website": "https://github.com/mikepenz/AboutLibraries",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
       "uniqueId": "com.mikepenz:aboutlibraries-core-jvm",
       "funding": [],
       "developers": [
@@ -435,7 +457,7 @@
           "name": "Mike Penz"
         }
       ],
-      "artifactVersion": "11.1.0",
+      "artifactVersion": "11.1.3",
       "description": "AboutLibraries automatically detects all dependencies of a project and collects their information including the license. Optionally visualising it via the provided ui components.",
       "scm": {
         "connection": "scm:git@github.com:mikepenz/AboutLibraries.git",
@@ -982,6 +1004,26 @@
       }
     },
     {
+      "uniqueId": "it.unimi.dsi:fastutil-core",
+      "funding": [],
+      "developers": [
+        {
+          "name": "Sebastiano Vigna"
+        }
+      ],
+      "artifactVersion": "8.5.12",
+      "description": "fastutil extends the Java Collections Framework by providing type-specific maps, sets, lists, and queues with a small memory footprint and fast operations; it provides also big (64-bit) arrays, sets, and lists, sorting algorithms, fast, practical I/O classes for binary and text files, and facilities for memory mapping large files. This jar (fastutil-core.jar) contains data structures based on integers, longs, doubles, and objects, only; fastutil.jar contains all classes. If you have both jars in your dependencies, this jar should be excluded.",
+      "scm": {
+        "connection": "scm:git://github.com/vigna/fastutil.git",
+        "url": "https://github.com/vigna/fastutil"
+      },
+      "name": "fastutil",
+      "website": "http://fastutil.di.unimi.it/",
+      "licenses": [
+        "Apache-2.0"
+      ]
+    },
+    {
       "uniqueId": "javax.annotation:javax.annotation-api",
       "funding": [],
       "developers": [
@@ -1005,6 +1047,31 @@
         "url": "https://javaee.github.io/glassfish",
         "name": "GlassFish Community"
       }
+    },
+    {
+      "uniqueId": "net.java.dev.jna:jna",
+      "funding": [],
+      "developers": [
+        {
+          "name": "Timothy Wall"
+        },
+        {
+          "name": "Matthias Bl\u00e4sing"
+        }
+      ],
+      "artifactVersion": "5.14.0",
+      "description": "Java Native Access",
+      "scm": {
+        "connection": "scm:git:https://github.com/java-native-access/jna",
+        "url": "https://github.com/java-native-access/jna",
+        "developerConnection": "scm:git:ssh://git@github.com/java-native-access/jna.git"
+      },
+      "name": "Java Native Access",
+      "website": "https://github.com/java-native-access/jna",
+      "licenses": [
+        "LGPL-2.1-or-later",
+        "Apache-2.0"
+      ]
     },
     {
       "uniqueId": "org.apache.commons:commons-pool2",
@@ -1110,50 +1177,6 @@
       }
     },
     {
-      "uniqueId": "org.jetbrains.androidx.lifecycle:lifecycle-common",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "2.8.0-beta02",
-      "description": "Android Lifecycle-Common",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Lifecycle-Common",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.androidx.lifecycle:lifecycle-runtime",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "2.8.0-beta02",
-      "description": "Android Lifecycle Runtime",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Lifecycle Runtime",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
       "uniqueId": "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose-desktop",
       "funding": [],
       "developers": [
@@ -1170,28 +1193,6 @@
         "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
       },
       "name": "Lifecycle Runtime Compose",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "2.8.0-beta02",
-      "description": "Android Lifecycle ViewModel",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Lifecycle ViewModel",
       "website": "https://github.com/JetBrains/compose-jb",
       "licenses": [
         "Apache-2.0"
@@ -1242,50 +1243,6 @@
       ]
     },
     {
-      "uniqueId": "org.jetbrains.compose.annotation-internal:annotation",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Provides source annotations for tooling and readability.",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Annotation",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.compose.collection-internal:collection",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Standalone efficient collections.",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "collections",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
       "uniqueId": "org.jetbrains.compose.components:components-resources-desktop",
       "funding": [],
       "developers": [
@@ -1302,28 +1259,6 @@
         "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
       },
       "name": "Resources for Compose JB",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.compose.desktop:desktop-jvm",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Compose Desktop",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Compose Desktop",
       "website": "https://github.com/JetBrains/compose-jb",
       "licenses": [
         "Apache-2.0"
@@ -1368,94 +1303,6 @@
         "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
       },
       "name": "Compose Layouts",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.compose.material3:material3-desktop",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Compose Material You Design Components library",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Compose Material3 Components",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.compose.material:material-desktop",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Compose Material Design Components library",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Compose Material Components",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.compose.material:material-icons-core-desktop",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Compose Material Design core icons. This module contains the most commonly used set of Material icons.",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Compose Material Icons Core",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.compose.material:material-ripple-desktop",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Material ripple used to build interactive components",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Compose Material Ripple",
       "website": "https://github.com/JetBrains/compose-jb",
       "licenses": [
         "Apache-2.0"
@@ -1588,50 +1435,6 @@
         "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
       },
       "name": "Compose UI Text",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.compose.ui:ui-tooling-preview-desktop",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Compose tooling library API. This library provides the API required to declare @Preview composables in user apps.",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Compose UI Preview Tooling",
-      "website": "https://github.com/JetBrains/compose-jb",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.compose.ui:ui-uikit",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "1.6.10-beta03",
-      "description": "Internal iOS UIKit utilities including Objective-C library.",
-      "scm": {
-        "connection": "scm:git:https://github.com/JetBrains/compose-jb.git",
-        "url": "https://github.com/JetBrains/compose-jb",
-        "developerConnection": "scm:git:https://github.com/JetBrains/compose-jb.git"
-      },
-      "name": "Compose UIKit Utils",
       "website": "https://github.com/JetBrains/compose-jb",
       "licenses": [
         "Apache-2.0"
@@ -1828,26 +1631,6 @@
       ]
     },
     {
-      "uniqueId": "org.jetbrains.kotlinx:kotlinx-datetime-jvm",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "JetBrains Team"
-        }
-      ],
-      "artifactVersion": "0.5.0",
-      "description": "Kotlin Datetime Library",
-      "scm": {
-        "url": "https://github.com/Kotlin/kotlinx-datetime"
-      },
-      "name": "kotlinx-datetime",
-      "website": "https://github.com/Kotlin/kotlinx-datetime",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
       "uniqueId": "org.jetbrains.kotlinx:kotlinx-serialization-bom",
       "funding": [],
       "developers": [
@@ -1908,28 +1691,6 @@
       ]
     },
     {
-      "uniqueId": "org.jetbrains.skiko:skiko",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "0.8.4",
-      "description": "Kotlin Skia bindings",
-      "scm": {
-        "connection": "scm:git:https://www.github.com/JetBrains/skiko.git",
-        "url": "https://www.github.com/JetBrains/skiko",
-        "developerConnection": "scm:git:https://www.github.com/JetBrains/skiko.git"
-      },
-      "name": "Skiko MPP",
-      "website": "https://www.github.com/JetBrains/skiko",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
       "uniqueId": "org.jetbrains.skiko:skiko-awt",
       "funding": [],
       "developers": [
@@ -1946,28 +1707,6 @@
         "developerConnection": "scm:git:https://www.github.com/JetBrains/skiko.git"
       },
       "name": "Skiko Awt",
-      "website": "https://www.github.com/JetBrains/skiko",
-      "licenses": [
-        "Apache-2.0"
-      ]
-    },
-    {
-      "uniqueId": "org.jetbrains.skiko:skiko-awt-runtime-macos-arm64",
-      "funding": [],
-      "developers": [
-        {
-          "organisationUrl": "https://www.jetbrains.com",
-          "name": "Compose Multiplatform Team"
-        }
-      ],
-      "artifactVersion": "0.8.4",
-      "description": "Kotlin Skia bindings",
-      "scm": {
-        "connection": "scm:git:https://www.github.com/JetBrains/skiko.git",
-        "url": "https://www.github.com/JetBrains/skiko",
-        "developerConnection": "scm:git:https://www.github.com/JetBrains/skiko.git"
-      },
-      "name": "Skiko JVM Runtime for MacOS Arm64",
       "website": "https://www.github.com/JetBrains/skiko",
       "licenses": [
         "Apache-2.0"
@@ -1996,16 +1735,57 @@
       ]
     },
     {
+      "uniqueId": "org.jetbrains:markdown-jvm",
+      "funding": [],
+      "developers": [
+        {
+          "organisationUrl": "https://jetbrains.com",
+          "name": "Valentin Fondaratov"
+        }
+      ],
+      "artifactVersion": "0.7.0",
+      "description": "Markdown parser in Kotlin",
+      "scm": {
+        "connection": "scm:git:git://github.com/JetBrains/markdown.git",
+        "url": "https://github.com/JetBrains/markdown"
+      },
+      "name": "markdown",
+      "website": "https://github.com/JetBrains/markdown",
+      "licenses": [
+        "Apache-2.0"
+      ]
+    },
+    {
       "uniqueId": "org.slf4j:slf4j-api",
       "funding": [],
       "developers": [],
-      "artifactVersion": "2.0.3",
+      "artifactVersion": "2.0.6",
       "description": "The slf4j API",
       "scm": {
         "connection": "scm:git:https://github.com/qos-ch/slf4j.git",
         "url": "https://github.com/qos-ch/slf4j"
       },
       "name": "SLF4J API Module",
+      "website": "http://www.slf4j.org",
+      "licenses": [
+        "MIT"
+      ],
+      "organization": {
+        "url": "http://www.qos.ch",
+        "name": "QOS.ch"
+      }
+    },
+    {
+      "uniqueId": "org.slf4j:slf4j-nop",
+      "funding": [],
+      "developers": [],
+      "artifactVersion": "2.0.6",
+      "description": "SLF4J NOP Binding",
+      "scm": {
+        "connection": "scm:git:https://github.com/qos-ch/slf4j.git",
+        "url": "https://github.com/qos-ch/slf4j"
+      },
+      "name": "SLF4J NOP Binding",
       "website": "http://www.slf4j.org",
       "licenses": [
         "MIT"
@@ -2042,6 +1822,13 @@
       "url": "https://spdx.org/licenses/BSD-3-Clause.html",
       "spdxId": "BSD-3-Clause",
       "name": "BSD 3-Clause \"New\" or \"Revised\" License"
+    },
+    "LGPL-2.1-or-later": {
+      "hash": "LGPL-2.1-or-later",
+      "internalHash": "LGPL-2.1-or-later",
+      "url": "https://www.gnu.org/licenses/old-licenses/lgpl-2.1",
+      "spdxId": "LGPL-2.1-or-later",
+      "name": "LGPL-2.1-or-later"
     },
     "MIT": {
       "content": "MIT License\n\nCopyright (c) <year> <copyright holders>\n\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.",
