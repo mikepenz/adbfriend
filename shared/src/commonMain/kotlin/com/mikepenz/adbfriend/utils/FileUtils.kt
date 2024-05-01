@@ -1,4 +1,4 @@
-package com.mikepenz.adbfriend
+package com.mikepenz.adbfriend.utils
 
 import java.io.File
 import java.math.BigInteger

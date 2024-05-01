@@ -4,7 +4,6 @@ import java.util.*
 plugins {
     id("com.mikepenz.kotlin.multiplatform")
     id("com.mikepenz.compose")
-    alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.aboutlibraries)
 }
 
@@ -13,7 +12,7 @@ if (appSigningFile != null) {
 }
 
 compose {
-    kotlinCompilerPlugin.set(libs.versions.jetpackcompose.compiler.get())
+    kotlinCompilerPlugin = "org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable:2.0.0-RC2"
 }
 
 kotlin {
@@ -26,15 +25,14 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(projects.shared)
+                implementation(compose.components.resources)
             }
         }
-
         jvmMain.dependencies {
             implementation(compose.runtime) { require(true) }
             implementation(compose.foundation) { require(true) }
             implementation(compose.material3) { require(true) }
             implementation(compose.ui) { require(true) }
-            implementation(compose.components.resources) { require(true) }
             implementation(compose.desktop.currentOs)
 
             implementation(libs.bundles.aboutlibs) // aboutlibraries
@@ -44,8 +42,6 @@ kotlin {
 
 compose.desktop {
     application {
-        //from(sourceSets.)
-
         mainClass = "MainKt"
 
         buildTypes.release.proguard {
@@ -58,7 +54,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ADBFriend"
-            packageVersion = "1.0.0"
+            packageVersion = libs.versions.versionName.get()
             description = ""
             copyright = "© 2024 Mike Penz. All rights reserved."
         }

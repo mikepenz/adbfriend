@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.malinskiy.adam.request.device.Device
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.mikepenz.adbfriend.model.Package
 import kotlin.system.exitProcess
 
 class Packages : AdbPackagesCommand("packages") {

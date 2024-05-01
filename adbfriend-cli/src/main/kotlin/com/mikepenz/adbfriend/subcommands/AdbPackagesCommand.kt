@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.malinskiy.adam.request.device.Device
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.mikepenz.adbfriend.model.Package
 import com.mikepenz.adbfriend.utils.convertGlobToRegex
 import com.mikepenz.adbfriend.utils.packageParser
 import kotlin.system.exitProcess
@@ -52,9 +53,3 @@ abstract class AdbPackagesCommand(private val action: String) : AdbCommand() {
 
     abstract suspend fun runForPackages(device: Device, packages: List<Package>)
 }
-
-data class Package(
-    val packageName: String,
-    val versionName: String,
-    val dataDir: String,
-)

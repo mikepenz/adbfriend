@@ -1,28 +1,37 @@
 [versions]
-agp = "8.3.0"
+versionName = "1.0.0"
 
-jetpackcompose-compiler = "1.5.8"
-compose-multiplatform = "1.6.0"
-kotlin = "1.9.22"
-ktor = "3.0.0-wasm2"
+compose-plugin = "1.6.10-beta03"
+kotlin = "2.0.0-RC2"
+kotlin-coroutines = "1.8.1-Beta"
 aboutlib = "11.1.0"
+adam = "0.5.6"
+clikt = "4.4.0"
+slf4j = "2.0.6"
+shadow = "8.1.1"
+buildconfig = "5.3.5"
 
 [plugins]
-composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 mavenpublish = { id = "com.vanniktech.maven.publish", version = "0.27.0" }
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlib" }
+shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 
 [libraries]
-ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 aboutlibraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutlib" }
 aboutlibraries-compose = { module = "com.mikepenz:aboutlibraries-compose-m3", version.ref = "aboutlib" }
+adam = { module = "com.malinskiy.adam:adam", version.ref = "adam" }
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
+slf4j = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
 
 # Build logic dependencies
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-compose-gradlePlugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-multiplatform" }
+compose-gradlePlugin = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose-plugin" }
 
 [bundles]
 aboutlibs = ["aboutlibraries-core", "aboutlibraries-compose"]
