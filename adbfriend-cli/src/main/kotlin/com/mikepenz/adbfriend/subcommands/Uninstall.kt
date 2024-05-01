@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.mordant.terminal.YesNoPrompt
 import com.malinskiy.adam.request.device.Device
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.mikepenz.adbfriend.model.Package
 import kotlin.system.exitProcess
 
 class Uninstall : AdbPackagesCommand("uninstall") {

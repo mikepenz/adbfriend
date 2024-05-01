@@ -3,6 +3,17 @@
 > [!NOTE]  
 > This README is under construction.
 
+# AboutLibraries 
+
+## Generate `aboutlibraries.json` for `adbfriend`
+```bash
+./gradlew adbfriend:exportLibraryDefinitions -PaboutLibraries.exportPath=src/jvmMain/composeResources/files/
+```
+
+## Generate `aboutlibraries.json` for `adbfriend-cli`
+```bash
+./gradlew adbfriend-cli:exportLibraryDefinitions -PaboutLibraries.exportPath=src/main/composeResources/files/
+```
 
 ### License
 

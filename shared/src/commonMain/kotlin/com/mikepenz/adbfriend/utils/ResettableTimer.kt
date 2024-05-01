@@ -1,4 +1,4 @@
-package com.mikepenz.adbfriend
+package com.mikepenz.adbfriend.utils
 
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext

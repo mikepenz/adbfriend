@@ -1,6 +1,7 @@
 package com.mikepenz.adbfriend
 
 import OpenSourceInitiative
+import adbfriend_root.adbfriend.generated.resources.Res
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +14,9 @@ import androidx.compose.ui.platform.LocalUriHandler
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibraryDefaults
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
 @Composable
 fun App() {
     val uriHandler = LocalUriHandler.current
@@ -52,7 +54,7 @@ fun App() {
                 if (showLicenses) {
                     var libs by remember { mutableStateOf<Libs?>(null) }
                     LaunchedEffect("aboutlibraries.json") {
-                        // libs = Libs.Builder().withJson(Res.readBytes("files/aboutlibraries.json").decodeToString()).build()
+                        libs = Libs.Builder().withJson(Res.readBytes("files/aboutlibraries.json").decodeToString()).build()
                     }
                     LibrariesContainer(
                         libraries = libs,

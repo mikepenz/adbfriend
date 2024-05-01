@@ -1,6 +1,6 @@
 package com.mikepenz.adbfriend.utils
 
-import com.mikepenz.adbfriend.subcommands.Package
+import com.mikepenz.adbfriend.model.Package
 
 private const val PACKAGES = "Packages:"
 private const val COMMON_START = " "
@@ -11,7 +11,7 @@ private const val PACKAGE_LAST_UPDATE = "lastUpdateTime="
 private const val PACKAGE_FIRST_INSTALL = "firstInstallTime="
 private val PACKAGE_DETAILS = arrayOf(PACKAGE_VERSION_NAME, PACKAGE_DATA_DIR, PACKAGE_LAST_UPDATE, PACKAGE_FIRST_INSTALL)
 
-internal fun packageParser(packageString: String, debug: Boolean = false, log: (String) -> Unit): List<Package> {
+fun packageParser(packageString: String, debug: Boolean = false, log: (String) -> Unit): List<Package> {
     val collectedPackages: MutableList<Package> = mutableListOf()
     var inPackages = true
     var currentPackage: String? = null

@@ -11,7 +11,11 @@ import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
 import com.malinskiy.adam.request.shell.v2.ShellCommandResult
 import com.malinskiy.adam.request.sync.v2.ListFileRequest
 import com.malinskiy.adam.request.sync.v2.PushFileRequest
-import com.mikepenz.adbfriend.*
+import com.mikepenz.adbfriend.extensions.escapeForMD5
+import com.mikepenz.adbfriend.extensions.escapeForSync
+import com.mikepenz.adbfriend.utils.md5
+import com.mikepenz.adbfriend.utils.retry
+import com.mikepenz.adbfriend.utils.withResettableTimeoutOrNull
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import kotlin.math.roundToInt
