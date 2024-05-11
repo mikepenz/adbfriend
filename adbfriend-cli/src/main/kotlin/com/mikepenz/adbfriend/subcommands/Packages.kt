@@ -41,7 +41,7 @@ class Packages : AdbPackagesCommand("packages") {
             var success = true
             packages.onEach { p ->
                 adb.execute(
-                    request = ShellCommandRequest("adb shell pm clear ${p.packageName}"), serial = device.serial
+                    request = ShellCommandRequest("pm clear ${p.packageName}"), serial = device.serial
                 ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
                     success = false
                     completeSuccess = false

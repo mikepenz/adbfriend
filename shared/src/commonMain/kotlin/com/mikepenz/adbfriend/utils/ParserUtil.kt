@@ -1,6 +1,7 @@
 package com.mikepenz.adbfriend.utils
 
 import com.mikepenz.adbfriend.model.Package
+import com.mikepenz.adbfriend.model.UsbInformation
 
 private const val PACKAGES = "Packages:"
 private const val COMMON_START = " "
@@ -72,3 +73,55 @@ fun packageParser(packageString: String, debug: Boolean = false, log: (String) -
     if (debug) collectedPackages.onEach { log("  ${it.packageName} - ${it.versionName}") }
     return collectedPackages
 }
+
+private const val SERIAL_NUMBER = "Serial Number: "
+private const val SPEED = "Speed: "
+
+fun usbProtocolParser(usbProtocolString: String = DEMO_STRING): List<UsbInformation> {
+    val usbInformation: MutableList<UsbInformation> = mutableListOf()
+
+    var serial: String? = null
+    var speed: String? = null
+    for (line in usbProtocolString.lineSequence()) {
+        if (line.isNotBlank()) {
+            val trimmedLine = line.trim()
+            if (trimmedLine.startsWith(SERIAL_NUMBER, true)) {
+                serial = trimmedLine.substring(SERIAL_NUMBER.length)
+            } else if (trimmedLine.startsWith(SPEED, true)) {
+                speed = trimmedLine.substring(SPEED.length)
+            }
+            if (serial.isNullOrBlank().not() && speed.isNullOrBlank().not()) {
+                usbInformation.add(UsbInformation(serial!!, speed!!))
+            }
+        } else {
+            serial = null
+            speed = null
+        }
+    }
+    return usbInformation
+}
+
+const val DEMO_STRING = """
+USB:
+
+    USB 3.1 Bus:
+
+      Host Controller Driver: AppleT8122USBXHCI
+
+        Pixel 8 Pro:
+
+          Product ID: 0x4ee7
+          Vendor ID: 0x18d1  (Google Inc.)
+          Version: 5.15
+          Serial Number: 39211FDJG0010Z
+          Speed: Up to 480 Mb/s
+          Manufacturer: Google
+          Location ID: 0x00100000 / 1
+          Current Available (mA): 500
+          Current Required (mA): 500
+          Extra Operating Current (mA): 0
+
+    USB 3.1 Bus:
+
+      Host Controller Driver: AppleT8122USBXHCI
+"""

@@ -38,7 +38,7 @@ abstract class AdbCommand : CliktCommand() {
             val devices: List<Device> = adb.execute(request = ListDevicesRequest())
             if (devices.isEmpty()) {
                 echo("⚠\uFE0F Didn't detect active devices connected via ADB.")
-                exitProcess(1)
+                if (FAIL_IF_NO_DEVICE) exitProcess(1)
             }
 
             // filter to devices as defined by input
@@ -49,7 +49,7 @@ abstract class AdbCommand : CliktCommand() {
 
             if (filteredDevices.isEmpty()) {
                 echo("⚠\uFE0F No device matched the `--serials` input.")
-                exitProcess(1)
+                if (FAIL_IF_NO_DEVICE) exitProcess(1)
             }
 
             runWithAdb(filteredDevices)
@@ -59,4 +59,8 @@ abstract class AdbCommand : CliktCommand() {
     }
 
     abstract suspend fun runWithAdb(devices: List<Device>)
+
+    companion object {
+        const val FAIL_IF_NO_DEVICE = true
+    }
 }
