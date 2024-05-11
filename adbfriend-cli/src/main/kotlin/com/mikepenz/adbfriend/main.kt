@@ -28,7 +28,7 @@ class AdbFriend : CliktCommand(name = "adbfriend") {
         Logger.getLogger("io.netty").setLevel(Level.OFF)
         versionOption(BuildConfig.APP_VERSION)
 
-        eagerOption("--about", help = "Outputs the used libraries to the terminal.") {
+        eagerOption("--licenses", help = "Outputs the used libraries to the terminal.") {
             val libraries = runBlocking {
                 Libs.Builder().withJson(Res.readBytes("files/aboutlibraries.json").decodeToString()).build()
             }
