@@ -1,5 +1,5 @@
 [versions]
-versionName = "1.1.0"
+versionName = "1.2.0"
 
 compose-plugin = "1.6.11"
 kotlin = "2.0.10"
