@@ -15,6 +15,7 @@ class Test : AdbCommand() {
     private val resetAutofill: Boolean by option().flag().help("Also sets the `autofill_service` to null when configuring")
     private val touches: Boolean by option().flag().help("Also enables touches when configuring for tests (`--reset` will disable again)")
     private val unlock: Boolean by option().flag().help("Attempts to unlock the device by sending (`keyevent 82`)")
+    private val collapse: Boolean by option().flag().help("Attempts to collapse the statusbar")
     private val force: Boolean by option().flag().help("Skips all warning prompts, and applies settings without confirmation.")
 
     override suspend fun runWithAdb(devices: List<Device>) {
@@ -101,6 +102,11 @@ class Test : AdbCommand() {
                 if (unlock) {
                     repeat(2) { adb.execute(request = ShellCommandRequest("input keyevent 82"), serial = device.serial) }
                     echo("  ℹ\uFE0F Device unlock attempted.")
+                }
+
+                if (collapse) {
+                    adb.execute(request = ShellCommandRequest("cmd statusbar collapse"), serial = device.serial)
+                    echo("  ℹ\uFE0F Statusbar collapse attempted.")
                 }
             }
 

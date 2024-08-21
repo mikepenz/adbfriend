@@ -1,22 +1,22 @@
 [versions]
 versionName = "1.1.0"
 
-compose-plugin = "1.6.10-rc01"
-kotlin = "2.0.0-RC3"
-kotlin-coroutines = "1.8.1-Beta"
-aboutlib = "11.2.0-a01"
-adam = "0.5.7"
+compose-plugin = "1.6.11"
+kotlin = "2.0.10"
+kotlin-coroutines = "1.9.0-RC.2"
+aboutlib = "11.2.2"
+adam = "0.5.8"
 clikt = "4.4.0"
 slf4j = "2.0.6"
 shadow = "8.1.1"
-buildconfig = "5.3.5"
+buildconfig = "5.4.0"
 
 [plugins]
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
 dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-mavenpublish = { id = "com.vanniktech.maven.publish", version = "0.27.0" }
+mavenpublish = { id = "com.vanniktech.maven.publish", version = "0.29.0" }
 aboutlibraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutlib" }
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
