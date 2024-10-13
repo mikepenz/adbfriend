@@ -2,9 +2,7 @@ package com.mikepenz.adbfriend
 
 import adbfriend_root.adbfriend_cli.BuildConfig
 import adbfriend_root.adbfriend_cli.generated.resources.Res
-import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.core.PrintMessage
-import com.github.ajalt.clikt.core.subcommands
+import com.github.ajalt.clikt.core.*
 import com.github.ajalt.clikt.parameters.options.*
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.adbfriend.subcommands.*
