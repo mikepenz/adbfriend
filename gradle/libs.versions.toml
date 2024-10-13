@@ -1,15 +1,15 @@
 [versions]
 versionName = "1.2.0"
 
-compose-plugin = "1.6.11"
-kotlin = "2.0.10"
-kotlin-coroutines = "1.9.0-RC.2"
+compose-plugin = "1.7.0-rc01"
+kotlin = "2.0.21"
+kotlin-coroutines = "1.9.0"
 aboutlib = "11.2.2"
 adam = "0.5.8"
-clikt = "4.4.0"
+clikt = "5.0.1"
 slf4j = "2.0.6"
 shadow = "8.1.1"
-buildconfig = "5.4.0"
+buildconfig = "5.5.0"
 
 [plugins]
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
