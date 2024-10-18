@@ -43,6 +43,7 @@ aboutLibraries {
 
 tasks.named("shadowJar", ShadowJar::class.java) {
     minimize {
+        exclude(dependency("com.github.ajalt.mordant:.*:.*"))
         exclude(dependency("org.slf4j:.*:.*"))
     }
 }
