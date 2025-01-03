@@ -1,5 +1,5 @@
 plugins {
-    id("com.mikepenz.kotlin.multiplatform")
+    id("com.mikepenz.convention.kotlin-multiplatform")
 }
 
 kotlin {
@@ -11,7 +11,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(libs.adam)
-                api(libs.kotlin.coroutines)
+                api(baseLibs.kotlin.coroutines.core)
             }
         }
     }
