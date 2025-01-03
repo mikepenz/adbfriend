@@ -1,12 +1,13 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    id("com.mikepenz.kotlin")
+    kotlin("jvm")
+    id("com.mikepenz.convention.kotlin-multiplatform")
     id("application")
-    id("com.mikepenz.compose")
+    id("com.mikepenz.convention.compose")
     alias(libs.plugins.shadow)
     alias(libs.plugins.buildconfig)
-    alias(libs.plugins.aboutlibraries)
+    alias(baseLibs.plugins.aboutlibraries)
 }
 
 kotlin {
@@ -15,7 +16,7 @@ kotlin {
             implementation(projects.shared)
             implementation(libs.clikt)
             implementation(libs.slf4j)
-            implementation(libs.aboutlibraries.core) // aboutlibraries
+            implementation(baseLibs.aboutlibraries.core) // aboutlibraries
 
             implementation(compose.runtime) { require(true) }
             implementation(compose.components.resources) {

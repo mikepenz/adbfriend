@@ -2,9 +2,9 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import java.util.*
 
 plugins {
-    id("com.mikepenz.kotlin.multiplatform")
-    id("com.mikepenz.compose")
-    alias(libs.plugins.aboutlibraries)
+    id("com.mikepenz.convention.kotlin-multiplatform")
+    id("com.mikepenz.convention.compose")
+    alias(baseLibs.plugins.aboutlibraries)
 }
 
 if (appSigningFile != null) {
@@ -12,10 +12,6 @@ if (appSigningFile != null) {
 }
 
 kotlin {
-    applyDefaultHierarchyTemplate()
-
-    jvm()
-
     sourceSets {
 
         val commonMain by getting {
@@ -31,7 +27,7 @@ kotlin {
             implementation(compose.ui) { require(true) }
             implementation(compose.desktop.currentOs)
 
-            implementation(libs.bundles.aboutlibs) // aboutlibraries
+            implementation(baseLibs.bundles.aboutlibs) // aboutlibraries
         }
     }
 }
@@ -52,7 +48,7 @@ compose.desktop {
             packageName = "ADBFriend"
             packageVersion = libs.versions.versionName.get()
             description = ""
-            copyright = "© 2024 Mike Penz. All rights reserved."
+            copyright = "© 2025 Mike Penz. All rights reserved."
         }
     }
 }
