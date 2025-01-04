@@ -1,13 +1,12 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
-    kotlin("jvm")
-    id("com.mikepenz.convention.kotlin-multiplatform")
+    id("com.mikepenz.convention.kotlin")
     id("application")
     id("com.mikepenz.convention.compose")
     alias(libs.plugins.shadow)
     alias(libs.plugins.buildconfig)
-    alias(baseLibs.plugins.aboutlibraries)
+    alias(baseLibs.plugins.aboutLibraries)
 }
 
 kotlin {
@@ -30,7 +29,7 @@ application {
     applicationName = "adbfriend"
     mainModule = "com.mikepenz.adbfriend.app"
     mainClass = "com.mikepenz.adbfriend.MainKt"
-    version = libs.versions.versionName.get()
+    version = property("VERSION_NAME").toString()
 }
 
 buildConfig {

@@ -11,7 +11,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(libs.adam)
-                api(baseLibs.kotlin.coroutines.core)
+                api(baseLibs.kotlinx.coroutines.core)
             }
         }
     }

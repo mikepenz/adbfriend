@@ -4,7 +4,7 @@ import java.util.*
 plugins {
     id("com.mikepenz.convention.kotlin-multiplatform")
     id("com.mikepenz.convention.compose")
-    alias(baseLibs.plugins.aboutlibraries)
+    alias(baseLibs.plugins.aboutLibraries)
 }
 
 if (appSigningFile != null) {
@@ -46,7 +46,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ADBFriend"
-            packageVersion = libs.versions.versionName.get()
+            packageVersion = property("VERSION_NAME").toString()
             description = ""
             copyright = "© 2025 Mike Penz. All rights reserved."
         }
@@ -67,21 +67,3 @@ private val appSigningFile: String?
             }
         }.getProperty(k, null) ?: if (project.hasProperty(k)) project.property(k)?.toString() else null
     }
-
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        if (project.findProperty("composeCompilerReports") == "true") {
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.layout.buildDirectory.asFile.get().absolutePath}/compose_compiler"
-            )
-        }
-        if (project.findProperty("composeCompilerMetrics") == "true") {
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.layout.buildDirectory.asFile.get().absolutePath}/compose_compiler"
-            )
-        }
-    }
-}

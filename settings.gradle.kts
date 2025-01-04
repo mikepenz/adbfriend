@@ -1,3 +1,5 @@
+rootProject.name = "adbfriend-root"
+
 pluginManagement {
     repositories {
         mavenCentral()
@@ -16,7 +18,7 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("baseLibs") {
-            from("com.mikepenz:version-catalog:0.0.2")
+            from("com.mikepenz:version-catalog:0.1.1")
         }
     }
 }
@@ -24,8 +26,6 @@ dependencyResolutionManagement {
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 // https://docs.gradle.org/7.6/userguide/configuration_cache.html#config_cache:stable
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
-
-rootProject.name = "adbfriend-root"
 
 include(
     ":shared", ":adbfriend", ":adbfriend-cli",
