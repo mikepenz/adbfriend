@@ -1,15 +1,12 @@
 [versions]
-conventionPlugin = "0.1.0"
-
-adam = "0.5.8"
-clikt = "5.0.1"
-slf4j = "2.0.6"
-shadow = "8.1.1"
-buildconfig = "5.5.0"
+adam = "0.5.10"
+clikt = "5.0.3"
+slf4j = "2.0.16"
+shadow = "9.0.0-beta8"
+buildconfig = "5.5.1"
 
 [plugins]
-conventionPlugin = { id = "com.mikepenz.convention.root", version.ref = "conventionPlugin" }
-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
 
 [libraries]
