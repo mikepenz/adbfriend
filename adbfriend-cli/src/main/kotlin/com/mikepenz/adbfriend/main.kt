@@ -40,7 +40,7 @@ class AdbFriend : CliktCommand(name = "adbfriend") {
     }
 
     override fun run() {
-        currentContext.obj = Config(dryRun, progress, serials)
+        currentContext.obj = Config(dryRun = dryRun, progress = progress, serials = serials)
     }
 }
 

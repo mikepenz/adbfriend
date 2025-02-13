@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.conventionPlugin)
+    alias(baseLibs.plugins.conventionPlugin)
 
     alias(baseLibs.plugins.composeMultiplatform) apply false
     alias(baseLibs.plugins.composeCompiler) apply false
