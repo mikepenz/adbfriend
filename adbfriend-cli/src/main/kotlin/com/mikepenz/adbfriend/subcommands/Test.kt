@@ -75,7 +75,10 @@ class Test : AdbCommand() {
                     ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
                         completeSuccess = false
                         echo("  ⚠\uFE0F Failed to set immersive mode ($it)")
-                    } ?: echo("  ✅ Immersive mode `confirmed`.")
+                    } ?: run {
+                        val validate = adb.execute(request = ShellCommandRequest("settings get secure immersive_mode_confirmation"), serial = device.serial).output.trim()
+                        echo("  ✅ Immersive mode `$validate`.")
+                    }
                 }
 
                 if (configure && resetAutoFillConfirmed) {
