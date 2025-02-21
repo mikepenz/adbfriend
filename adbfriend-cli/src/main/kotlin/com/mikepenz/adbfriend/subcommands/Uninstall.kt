@@ -1,5 +1,6 @@
 package com.mikepenz.adbfriend.subcommands
 
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
@@ -13,6 +14,10 @@ import kotlin.system.exitProcess
 class Uninstall : AdbPackagesCommand("uninstall") {
     private val keepData: Boolean by option().flag().help("Will keep the data when uninstalling. By default will also remove data.")
     private val force: Boolean by option().flag().help("Skips all warning prompts, and applies settings without confirmation.")
+
+    override fun help(context: Context) = """
+        This tool offers a flexible API to uninstall packages matching the pattern.
+    """.trimIndent()
 
     override suspend fun runForPackages(device: Device, packages: List<Package>) {
         // ensure the person wants to install all

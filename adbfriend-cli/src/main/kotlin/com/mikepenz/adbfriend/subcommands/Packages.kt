@@ -1,5 +1,6 @@
 package com.mikepenz.adbfriend.subcommands
 
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
@@ -12,6 +13,11 @@ class Packages : AdbPackagesCommand("packages") {
     private val immersiveFull: Boolean by option().flag().help("Sets the `immersive.full` for the identified package.")
     private val forceStop: Boolean by option().flag().help("Force stops the identified apps.")
     private val clear: Boolean by option().flag().help("Clears the app data and app cache.")
+
+    override fun help(context: Context) = """
+        This tool offers to manage packages on the connected devices. Specifically force stop or clear the app data for packages matching the pattern. 
+        It can also apply the `immersive.full` flag to the identified packages.
+    """.trimIndent()
 
     override fun run() {
         if (!immersiveFull && !forceStop && !clear) {
