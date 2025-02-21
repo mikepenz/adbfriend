@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 
 
 @Composable
-fun HypnoticCanvasTheme(
+fun AdbFriendTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
