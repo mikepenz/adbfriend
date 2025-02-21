@@ -69,4 +69,4 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           SHA256="$(sha256sum "adbfriend-cli/build/distributions/adbfriend-cli-shadow-${{ github.ref_name }}.zip" | cut -d " " -f 1)"
-          curl --retry 2 --connect-timeout 30 -X POST https://api.github.com/repos/mikepenz/homebrew-tap/dispatches -H 'Accept: applicatoin/vnd.github.everest-preview+json' -u mikepenz:${} --data '{"event_type": "update-tap", "client_payload": {"version":"${{ github.ref_name }}","sha":"'${SHA256}'"}}'
+          curl --retry 2 --connect-timeout 30 -X POST https://api.github.com/repos/mikepenz/homebrew-tap/dispatches -H 'Accept: applicatoin/vnd.github.everest-preview+json' -u ${{ secrets.TRIGGER_TOKEN }} --data '{"event_type": "update-tap", "client_payload": {"version":"${{ github.ref_name }}","sha":"'${SHA256}'"}}'
