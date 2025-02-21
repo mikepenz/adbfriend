@@ -1,5 +1,6 @@
 package com.mikepenz.adbfriend.subcommands
 
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
@@ -17,6 +18,11 @@ class Test : AdbCommand() {
     private val unlock: Boolean by option().flag().help("Attempts to unlock the device by sending (`keyevent 82`)")
     private val collapse: Boolean by option().flag().help("Attempts to collapse the statusbar")
     private val force: Boolean by option().flag().help("Skips all warning prompts, and applies settings without confirmation.")
+
+    override fun help(context: Context) = """
+        This tool collects different flags that are relevant to be applied for running tests on the target device.
+        Disable animations, set the immersive mode confirmation, unlock, ...
+    """.trimIndent()
 
     override suspend fun runWithAdb(devices: List<Device>) {
         try {

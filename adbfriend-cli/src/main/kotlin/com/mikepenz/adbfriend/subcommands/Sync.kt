@@ -1,6 +1,8 @@
 package com.mikepenz.adbfriend.subcommands
 
+import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.core.terminal
+import com.github.ajalt.clikt.core.theme
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.long
@@ -32,6 +34,11 @@ class Sync : AdbCommand() {
     private val retryDelay: Long by option().long().default(1_000L).help("Defines the delay after a upload failure occurred")
     private val failOnError: Boolean by option().flag().help("Defines if the action shall fatally fail if a single file fails to push")
     private val hideUp2date: Boolean by option().flag().help("When enabled, will hide any entries which are already up2date.")
+
+    override fun help(context: Context) = """
+        This tool provides a way to sync files from your local machine to the connected device.
+        It offers to exclude files, delete files on the remote which are not existing locally, and compare the MD5 of files to check for equality.
+    """.trimIndent()
 
     override suspend fun runWithAdb(devices: List<Device>) {
         try {

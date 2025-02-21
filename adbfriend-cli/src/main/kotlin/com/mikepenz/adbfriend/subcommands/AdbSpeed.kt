@@ -1,5 +1,6 @@
 package com.mikepenz.adbfriend.subcommands
 
+import com.github.ajalt.clikt.core.Context
 import com.malinskiy.adam.request.device.Device
 import com.mikepenz.adbfriend.extensions.fetchModel
 import com.mikepenz.adbfriend.utils.usbProtocolParser
@@ -9,6 +10,11 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 class AdbSpeed : AdbCommand() {
+
+    override fun help(context: Context) = """
+        Prints the USB speed of connected devices. Only supported on MacOS X.
+    """.trimIndent()
+
     override suspend fun runWithAdb(devices: List<Device>) {
         try {
             val osName = System.getProperty("os.name")
