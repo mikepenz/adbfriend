@@ -15,6 +15,22 @@ Its features were mostly designed for developers, but it can be useful for every
 - Extra tools
     - adb-speed (Helps to identify sub-par cables)
 
+## Install
+
+The installation can be performed using Homebrew. First you'll require the custom tap:
+
+```bash
+brew tap mikepenz/tap
+```
+
+Next, install the AdbFriend CLI:
+
+```bash
+brew install mikepenz/tap/adbfriend
+```
+
+Alternatively, you can download prebuild binaries for release page.
+
 ## Usage
 
 ADB Friend is a command line tool, which can be used in a terminal.
@@ -47,6 +63,13 @@ The project uses shadow to package the tool in a fat-jar, and also do minimal mi
 ```bash
 ./gradlew adbfriend-cli:exportLibraryDefinitions -PaboutLibraries.exportPath=src/main/composeResources/files/
 ```
+
+### Credits
+
+This project uses the amazing [adam](https://github.com/Malinskiy/adam) library
+from [Malinskiy](https://github.com/Malinskiy) to interact with `adb`.
+The CLI is set-up using the impressive [clikt](https://github.com/ajalt/clikt) library
+from [ajalt](https://github.com/ajalt/).
 
 ### License
 
