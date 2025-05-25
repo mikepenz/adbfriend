@@ -2,6 +2,7 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
@@ -51,6 +52,39 @@ fun Server.addInstalledPackageTools(adb: AndroidDebugBridgeClient) {
             } ?: true
         }
     }
+
+    addInstalledPackageTool(
+        adb = adb,
+        name = "uninstall-package",
+        extraProperties = mapOf(
+            "keep-data" to JsonObject(
+                mapOf(
+                    "type" to JsonPrimitive("boolean"),
+                    "description" to JsonPrimitive("Flag to keep the data when uninstalling the package. By default will also remove data.")
+                )
+            ),
+        ),
+        description = "The uninstall package endpoint uninstalls the provided package names on the Android device for the provided serial, optionally keeping app data.",
+    ) { adb, serial, packageNames ->
+        val keepData = arguments["keep-data"]?.jsonPrimitive?.booleanOrNull ?: false
+
+        packageNames.associateWith { p ->
+            adb.execute(
+                request = ShellCommandRequest(
+                    StringBuilder().apply {
+                        append("pm uninstall ")
+                        if (keepData) {
+                            append("-k ")
+                        }
+                        append(p)
+                    }.toString()
+                ),
+                serial = serial
+            ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
+                false
+            } ?: true
+        }
+    }
 }
 
 
@@ -58,14 +92,15 @@ private fun Server.addInstalledPackageTool(
     adb: AndroidDebugBridgeClient,
     name: String,
     description: String,
-    block: suspend (adb: AndroidDebugBridgeClient, serial: String, packageNames: Array<String>) -> Map<String, Boolean>
+    extraProperties: Map<String, JsonObject> = emptyMap(),
+    block: suspend CallToolRequest.(adb: AndroidDebugBridgeClient, serial: String, packageNames: Array<String>) -> Map<String, Boolean>
 ) {
     addTool(
         name = name,
         description = description,
         inputSchema = Tool.Input(
             properties = JsonObject(
-                mapOf(
+                extraProperties + mapOf(
                     "serial" to JsonObject(
                         mapOf(
                             "type" to JsonPrimitive("string"),
@@ -98,7 +133,7 @@ private fun Server.addInstalledPackageTool(
             )
         }
 
-        val results = block(adb, serial, packageNames.map { it.jsonPrimitive.content }.toTypedArray())
+        val results = request.block(adb, serial, packageNames.map { it.jsonPrimitive.content }.toTypedArray())
 
         val result = buildJsonObject {
             put("results", buildJsonArray {
