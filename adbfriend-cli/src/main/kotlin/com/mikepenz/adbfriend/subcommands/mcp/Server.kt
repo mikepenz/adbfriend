@@ -11,6 +11,7 @@ import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
 import com.malinskiy.adam.request.device.Device
 import com.mikepenz.adbfriend.subcommands.AdbCommand
+import com.mikepenz.adbfriend.subcommands.mcp.tools.addCheckAdbSpeedTool
 import com.mikepenz.adbfriend.subcommands.mcp.tools.addConnectedDevicesTool
 import com.mikepenz.adbfriend.subcommands.mcp.tools.addGetInstalledPackagesTool
 import io.ktor.server.application.*
@@ -106,6 +107,7 @@ class Server : AdbCommand() {
         )
         server.addConnectedDevicesTool(adb, devices)
         server.addGetInstalledPackagesTool(adb)
+        server.addCheckAdbSpeedTool(adb)
         return server
     }
 }

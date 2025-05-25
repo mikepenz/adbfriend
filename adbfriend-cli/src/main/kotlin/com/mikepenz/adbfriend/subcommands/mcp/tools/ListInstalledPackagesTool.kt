@@ -6,33 +6,17 @@ import com.mikepenz.adbfriend.utils.convertGlobToRegex
 import com.mikepenz.adbfriend.utils.packageParser
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.Server
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 fun Server.addGetInstalledPackagesTool(adb: AndroidDebugBridgeClient) {
     addTool(
         name = "get-installed-packages",
         description = "The get installed packages endpoint returns a list of installed packages on the Android device for the provided serial.",
-        inputSchema = Tool.Input(
-            properties = JsonObject(
-                mapOf(
-                    "serial" to JsonObject(
-                        mapOf(
-                            "type" to JsonPrimitive("string"),
-                            "description" to JsonPrimitive("The Android device serial string")
-                        )
-                    ),
-                    "package-filter" to JsonObject(
-                        mapOf(
-                            "type" to JsonPrimitive("string"),
-                            "description" to JsonPrimitive("An optional package name glob to filter the output list")
-                        )
-                    )
-                )
-            ),
-            required = listOf("serial")
-        )
+        inputSchema = DEVICE_FILTER_TOOL_INPUT
     ) { request ->
         val serial = request.arguments["serial"]?.jsonPrimitive?.content
         if (serial == null) {
