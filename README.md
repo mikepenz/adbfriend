@@ -66,6 +66,10 @@ for [Claude Desktop](https://modelcontextprotocol.io/quickstart/user#2-add-the-f
 }
 ```
 
+> [!NOTE]  
+> At this time the `adb-server` has to be already running on your machine.
+> Otherwise, a connection exception is thrown.
+
 ### Debug Server
 
 You can use the `npx @modelcontextprotocol/inspector` to debug the server once started.
