@@ -44,4 +44,4 @@ class AdbFriend : CliktCommand(name = "adbfriend") {
     }
 }
 
-fun main(args: Array<String>) = AdbFriend().subcommands(Sync(), Test(), Uninstall(), Packages(), Tools()).main(args)
+fun main(args: Array<String>) = AdbFriend().subcommands(Sync(), Test(), Uninstall(), Packages(), Tools(), Mcp()).main(args)
