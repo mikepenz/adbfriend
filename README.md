@@ -59,9 +59,7 @@ for [Claude Desktop](https://modelcontextprotocol.io/quickstart/user#2-add-the-f
       "command": "/opt/homebrew/bin/adbfriend",
       "args": [
         "mcp",
-        "server",
-        "--sse",
-        "true"
+        "server"
       ]
     }
   }
