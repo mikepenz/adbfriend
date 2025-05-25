@@ -14,6 +14,7 @@ import com.mikepenz.adbfriend.subcommands.AdbCommand
 import com.mikepenz.adbfriend.subcommands.mcp.tools.addCheckAdbSpeedTool
 import com.mikepenz.adbfriend.subcommands.mcp.tools.addConnectedDevicesTool
 import com.mikepenz.adbfriend.subcommands.mcp.tools.addGetInstalledPackagesTool
+import com.mikepenz.adbfriend.subcommands.mcp.tools.addInstalledPackageTools
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
@@ -108,6 +109,7 @@ class Server : AdbCommand() {
         server.addConnectedDevicesTool(adb, devices)
         server.addGetInstalledPackagesTool(adb)
         server.addCheckAdbSpeedTool(adb)
+        server.addInstalledPackageTools(adb)
         return server
     }
 }
