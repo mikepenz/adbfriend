@@ -21,6 +21,8 @@ kotlin {
             implementation(compose.components.resources) {
                 exclude("org.jetbrains.compose.foundation")
             }
+            implementation(libs.kotlinx.io.core)
+            implementation(libs.mcp.kotlin)
         }
     }
 }

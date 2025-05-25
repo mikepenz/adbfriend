@@ -18,13 +18,20 @@ import kotlin.system.exitProcess
 abstract class AdbCommand : CliktCommand() {
     protected val config by requireObject<Config>()
 
+    protected open val requireAdbServer: Boolean = true
+    protected open val failOnNoDevice: Boolean = true
+    protected open val enableLog: Boolean = true
+
     protected lateinit var adb: AndroidDebugBridgeClient
 
     override fun run() = runBlocking {
-        val successful = StartAdbInteractor().execute() //Start the adb server
-        if (!successful) {
-            echo("⚠\uFE0F Failed to detect the `adb` binary. Ensure your path is properly configured.")
-            exitProcess(1)
+        if (requireAdbServer) {
+            val successful = StartAdbInteractor().execute()
+            //Start the adb server
+            if (!successful) {
+                if (enableLog) echo("⚠\uFE0F Failed to detect the `adb` binary. Ensure your path is properly configured.")
+                exitProcess(1)
+            }
         }
 
         adb = AndroidDebugBridgeClientFactory().build() // Create adb client
@@ -32,13 +39,13 @@ abstract class AdbCommand : CliktCommand() {
         try {
             // Get ADB Version
             val version: Int = adb.execute(request = GetAdbServerVersionRequest())
-            echo("ℹ\uFE0F This machine uses ADB with version: ${version}.")
+            if (enableLog) echo("ℹ\uFE0F This machine uses ADB with version: ${version}.")
 
             // Get all devices
             val devices: List<Device> = adb.execute(request = ListDevicesRequest())
             if (devices.isEmpty()) {
-                echo("⚠\uFE0F Didn't detect active devices connected via ADB.")
-                if (FAIL_IF_NO_DEVICE) exitProcess(1)
+                if (enableLog) echo("⚠\uFE0F Didn't detect active devices connected via ADB.")
+                if (failOnNoDevice) exitProcess(1)
             }
 
             // filter to devices as defined by input
@@ -48,8 +55,8 @@ abstract class AdbCommand : CliktCommand() {
             } else devices
 
             if (filteredDevices.isEmpty()) {
-                echo("⚠\uFE0F No device matched the `--serials` input.")
-                if (FAIL_IF_NO_DEVICE) exitProcess(1)
+                if (enableLog) echo("⚠\uFE0F No device matched the `--serials` input.")
+                if (failOnNoDevice) exitProcess(1)
             }
 
             runWithAdb(filteredDevices)
@@ -59,8 +66,4 @@ abstract class AdbCommand : CliktCommand() {
     }
 
     abstract suspend fun runWithAdb(devices: List<Device>)
-
-    companion object {
-        const val FAIL_IF_NO_DEVICE = true
-    }
 }

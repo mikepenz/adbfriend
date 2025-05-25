@@ -4,6 +4,8 @@ clikt = "5.0.3"
 slf4j = "2.0.17"
 shadow = "8.1.1"
 buildconfig = "5.6.5"
+mcp = "0.5.0"
+kotlinx-io = "0.7.0"
 
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
@@ -13,3 +15,5 @@ buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig
 adam = { module = "com.malinskiy.adam:adam", version.ref = "adam" }
 clikt = { module = "com.github.ajalt.clikt:clikt", version.ref = "clikt" }
 slf4j = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
+mcp-kotlin = { module = "io.modelcontextprotocol:kotlin-sdk", version.ref = "mcp" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
