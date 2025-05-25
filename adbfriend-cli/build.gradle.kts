@@ -37,8 +37,15 @@ buildConfig {
 }
 
 aboutLibraries {
-    registerAndroidTasks = false
-    duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+    android {
+        registerAndroidTasks = false
+    }
+    library {
+        duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+    }
+    export {
+        outputPath = file("src/main/composeResources/files/aboutlibraries.json")
+    }
 }
 
 tasks.named("shadowJar", ShadowJar::class.java) {

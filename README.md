@@ -55,13 +55,13 @@ The project uses shadow to package the tool in a fat-jar, and also do minimal mi
 ## Generate `aboutlibraries.json` for `adbfriend`
 
 ```bash
-./gradlew adbfriend:exportLibraryDefinitions -PaboutLibraries.exportPath=src/jvmMain/composeResources/files/
+./gradlew adbfriend:exportLibraryDefinitions
 ```
 
 ## Generate `aboutlibraries.json` for `adbfriend-cli`
 
 ```bash
-./gradlew adbfriend-cli:exportLibraryDefinitions -PaboutLibraries.exportPath=src/main/composeResources/files/
+./gradlew adbfriend-cli:exportLibraryDefinitions
 ```
 
 ### Credits
