@@ -12,6 +12,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import com.malinskiy.adam.request.device.Device
 import com.mikepenz.adbfriend.subcommands.AdbCommand
 import com.mikepenz.adbfriend.subcommands.mcp.tools.addConnectedDevicesTool
+import com.mikepenz.adbfriend.subcommands.mcp.tools.addGetInstalledPackagesTool
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
@@ -104,6 +105,7 @@ class Server : AdbCommand() {
             )
         )
         server.addConnectedDevicesTool(adb, devices)
+        server.addGetInstalledPackagesTool(adb)
         return server
     }
 }

@@ -7,10 +7,7 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.Server
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.buildJsonArray
-import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.*
 
 fun Server.addConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Device>) {
     addTool(
@@ -22,28 +19,37 @@ fun Server.addConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<
                     "serial" to JsonObject(
                         mapOf(
                             "type" to JsonPrimitive("string"),
-                            "description" to JsonPrimitive("The Android device serial string")
+                            "description" to JsonPrimitive("The Android device serial string to filter the output list")
                         )
                     ),
                     "name" to JsonObject(
                         mapOf(
                             "type" to JsonPrimitive("string"),
-                            "description" to JsonPrimitive("The Android device model name")
+                            "description" to JsonPrimitive("The Android device model name to filter the output list")
                         )
                     ),
                 )
             ),
             required = listOf()
         )
-    ) {
+    ) { request ->
+        val serial = request.arguments["serial"]?.jsonPrimitive?.content?.trim()
+        val name = request.arguments["name"]?.jsonPrimitive?.content?.trim()
+
         val result = buildJsonObject {
             put("devices", buildJsonArray {
                 devices.onEach { device ->
-                    add(buildJsonObject {
-                        put("serial", JsonPrimitive(device.serial))
-                        put("model", JsonPrimitive(adb.fetchModel(device) {}))
-                        put("state", JsonPrimitive(device.state.name))
-                    })
+                    if (serial.isNullOrBlank() || serial.equals(device.serial, true)) {
+                        val model = adb.fetchModel(device) {}
+
+                        if (name.isNullOrBlank() || model.equals(name, true)) {
+                            add(buildJsonObject {
+                                put("serial", JsonPrimitive(device.serial))
+                                put("model", JsonPrimitive(model))
+                                put("state", JsonPrimitive(device.state.name))
+                            })
+                        }
+                    }
                 }
             })
         }
