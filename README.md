@@ -68,6 +68,23 @@ for [Claude Desktop](https://modelcontextprotocol.io/quickstart/user#2-add-the-f
 }
 ```
 
+### Debug Server
+
+You can use the `npx @modelcontextprotocol/inspector` to debug the server once started.
+
+```bash
+# Install and run inspector in your terminal
+npx @modelcontextprotocol/inspector
+```
+
+Then launch the website (with the url as provided in the terminal).
+Launch the `mcp server` using IntelliJ or the actual command.
+
+```bash
+# Default port is `3001`
+adbfriend mcp server --sse true
+```
+
 ### Supported tools
 
 - get-connected-devices
