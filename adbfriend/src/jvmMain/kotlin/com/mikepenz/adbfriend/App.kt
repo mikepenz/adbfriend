@@ -17,7 +17,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
-import com.mikepenz.aboutlibraries.ui.compose.m3.LibraryDefaults
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
@@ -67,7 +66,6 @@ fun App() {
                     LibrariesContainer(
                         libraries = libs,
                         modifier = Modifier.fillMaxSize(),
-                        colors = LibraryDefaults.libraryColors(backgroundColor = Color.Transparent),
                         contentPadding = contentPadding
                     )
                 } else {

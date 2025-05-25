@@ -13,7 +13,6 @@ if (appSigningFile != null) {
 
 kotlin {
     sourceSets {
-
         val commonMain by getting {
             dependencies {
                 implementation(projects.shared)
@@ -54,8 +53,15 @@ compose.desktop {
 }
 
 aboutLibraries {
-    registerAndroidTasks = false
-    duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+    android {
+        registerAndroidTasks = false
+    }
+    library {
+        duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
+    }
+    export {
+        outputPath = file("src/main/composeResources/jvmMain/aboutlibraries.json")
+    }
 }
 
 private val appSigningFile: String?
