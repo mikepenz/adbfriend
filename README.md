@@ -38,26 +38,31 @@ ADB Friend is a command line tool, which can be used in a terminal.
 ```bash
 # Get started with the `--help` command, to get information and an overview on the various features offered.
 adbfriend --help
+```
 
 ## MCP Server
 
-ADB Friend (Since version 1.4.0) also provides a [Model Context Protocol (MCP) Server](https://modelcontextprotocol.io/introduction), that can be configured in popular AI Tools like [Claude Desktop](https://modelcontextprotocol.io/quickstart/user), [GitHub Copilot](https://docs.github.com/en/copilot/customizing-copilot/extending-copilot-chat-with-mcp), [RayCast](https://manual.raycast.com/model-context-protocol), ...
+ADB Friend (Since version 1.4.0) also provides
+a [Model Context Protocol (MCP) Server](https://modelcontextprotocol.io/introduction), that can be configured in popular
+AI Tools
+like [Claude Desktop](https://modelcontextprotocol.io/quickstart/user), [GitHub Copilot](https://docs.github.com/en/copilot/customizing-copilot/extending-copilot-chat-with-mcp), [RayCast](https://manual.raycast.com/model-context-protocol), ...
 
 ### Configuration
 
-The location and details of the configuration file will depend on the used tool. Below example for [Claude Desktop](https://modelcontextprotocol.io/quickstart/user#2-add-the-filesystem-mcp-server). 
+The location and details of the configuration file will depend on the used tool. Below example
+for [Claude Desktop](https://modelcontextprotocol.io/quickstart/user#2-add-the-filesystem-mcp-server).
 
 ```json
 {
   "mcpServers": {
     "adb-friend": {
-        "command": "/opt/homebrew/bin/adbfriend",
-        "args": [
-            "mcp",
-            "server",
-            "--sse",
-            "true"
-        ]
+      "command": "/opt/homebrew/bin/adbfriend",
+      "args": [
+        "mcp",
+        "server",
+        "--sse",
+        "true"
+      ]
     }
   }
 }
