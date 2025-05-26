@@ -57,12 +57,10 @@ fun createInstalledPackageTools(adb: AndroidDebugBridgeClient) = buildList {
         adb = adb,
         name = "uninstall-package",
         extraProperties = mapOf(
-            "keep-data" to JsonObject(
-                mapOf(
-                    "type" to JsonPrimitive("boolean"),
-                    "description" to JsonPrimitive("Flag to keep the data when uninstalling the package. By default will also remove data.")
-                )
-            ),
+            "keep-data" to buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Flag to keep the data when uninstalling the package. By default will also remove data."))
+            },
         ),
         description = "The uninstall package endpoint uninstalls the provided package names on the Android device for the provided serial, optionally keeping app data.",
     ) { adb, serial, packageNames ->
@@ -78,8 +76,7 @@ fun createInstalledPackageTools(adb: AndroidDebugBridgeClient) = buildList {
                         }
                         append(p)
                     }.toString()
-                ),
-                serial = serial
+                ), serial = serial
             ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
                 false
             } ?: true
@@ -98,26 +95,21 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
     add(
         RegisteredTool(
             Tool(
-                name = name,
-                description = description,
-                inputSchema = Tool.Input(
-                    properties = JsonObject(
-                        extraProperties + mapOf(
-                            "serial" to JsonObject(
-                                mapOf(
-                                    "type" to JsonPrimitive("string"),
-                                    "description" to JsonPrimitive("The Android device serial string to filter the output list")
-                                )
-                            ),
-                            "package-names" to JsonObject(
-                                mapOf(
-                                    "type" to JsonPrimitive("array"),
-                                    "description" to JsonPrimitive("The array of package names to clear the data for.")
-                                )
-                            ),
-                        )
-                    ),
-                    required = listOf(
+                name = name, description = description, inputSchema = Tool.Input(
+                    properties = buildJsonObject {
+                        extraProperties.onEach { put(it.key, it.value) }
+                        put("serial", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The Android device serial string to filter the output list"))
+                        })
+                        put("package-names", buildJsonObject {
+                            put("type", JsonPrimitive("array"))
+                            put("items", buildJsonObject {
+                                put("type", JsonPrimitive("string"))
+                            })
+                            put("description", JsonPrimitive("The array of package names to clear the data for."))
+                        })
+                    }, required = listOf(
                         "serial", "package-names"
                     )
                 )
