@@ -14,6 +14,7 @@ kotlin {
         dependencies {
             implementation(projects.shared)
             implementation(libs.clikt)
+            // implementation(libs.mordant)
             implementation(libs.slf4j)
             implementation(baseLibs.aboutlibraries.core) // aboutlibraries
 

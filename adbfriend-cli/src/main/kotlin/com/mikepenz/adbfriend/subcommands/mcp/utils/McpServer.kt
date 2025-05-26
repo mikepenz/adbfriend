@@ -1,25 +1,19 @@
 package com.mikepenz.adbfriend.subcommands.mcp.utils
 
 import adbfriend_root.adbfriend_cli.BuildConfig
-import com.malinskiy.adam.AndroidDebugBridgeClient
-import com.malinskiy.adam.request.device.Device
 import com.mikepenz.adbfriend.subcommands.mcp.SseOptions
-import com.mikepenz.adbfriend.subcommands.mcp.tools.buildTools
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.utils.io.streams.*
 import io.modelcontextprotocol.kotlin.sdk.Implementation
 import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
-import io.modelcontextprotocol.kotlin.sdk.server.Server
-import io.modelcontextprotocol.kotlin.sdk.server.ServerOptions
-import io.modelcontextprotocol.kotlin.sdk.server.StdioServerTransport
-import io.modelcontextprotocol.kotlin.sdk.server.mcp
+import io.modelcontextprotocol.kotlin.sdk.server.*
 import kotlinx.coroutines.Job
 import kotlinx.io.asSink
 import kotlinx.io.buffered
 
-suspend fun AndroidDebugBridgeClient.setupServer(sseOptions: SseOptions?, devices: List<Device>, echo: (String) -> Unit, enableLog: Boolean = false) {
-    val server = configureServer(devices)
+suspend fun setupServer(sseOptions: SseOptions?, builtTools: List<RegisteredTool>, echo: (String) -> Unit, enableLog: Boolean = false) {
+    val server = configureServer(builtTools)
     val sseOptions = sseOptions
     if (sseOptions?.sse == true) {
         if (enableLog) echo("Starting SSE MCP server on port ${sseOptions.port}")
@@ -44,7 +38,7 @@ suspend fun AndroidDebugBridgeClient.setupServer(sseOptions: SseOptions?, device
     }
 }
 
-private fun AndroidDebugBridgeClient.configureServer(devices: List<Device>): Server {
+private fun configureServer(builtTools: List<RegisteredTool>): Server {
     val server = Server(
         Implementation(
             name = "mcp-kotlin AdbFriend server",
@@ -58,6 +52,6 @@ private fun AndroidDebugBridgeClient.configureServer(devices: List<Device>): Ser
             )
         )
     )
-    server.addTools(buildTools(this, devices))
+    server.addTools(builtTools)
     return server
 }
