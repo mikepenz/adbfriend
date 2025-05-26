@@ -60,14 +60,17 @@ for [Claude Desktop](https://modelcontextprotocol.io/quickstart/user#2-add-the-f
       "args": [
         "mcp",
         "server"
-      ]
+      ],
+      "env": {
+        "ANDROID_HOME": "/Users/mikepenz/Development/android/sdk"
+      }
     }
   }
 }
 ```
 
-> [!NOTE]  
-> At this time the `adb-server` has to be already running on your machine.
+> [!IMPORTANT]  
+> If `ANDROID_HOME` is not provided, the `adb-server` has to be manually started on your machine.
 > Otherwise, a connection exception is thrown.
 
 ### Debug Server

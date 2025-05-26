@@ -25,13 +25,11 @@ abstract class AdbCommand : CliktCommand() {
     protected lateinit var adb: AndroidDebugBridgeClient
 
     override fun run() = runBlocking {
-        if (requireAdbServer) {
-            val successful = StartAdbInteractor().execute()
-            //Start the adb server
-            if (!successful) {
-                if (enableLog) echo("⚠\uFE0F Failed to detect the `adb` binary. Ensure your path is properly configured.")
-                exitProcess(1)
-            }
+        val successful = StartAdbInteractor().execute()
+        //Start the adb server
+        if (!successful && requireAdbServer) {
+            if (enableLog) echo("⚠\uFE0F Failed to detect the `adb` binary. Ensure your path is properly configured.")
+            exitProcess(1)
         }
 
         adb = AndroidDebugBridgeClientFactory().build() // Create adb client
