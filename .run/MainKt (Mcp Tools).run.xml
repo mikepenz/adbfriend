@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="MainKt (Mcp Tools)" type="JetRunConfigurationType">
+    <option name="MAIN_CLASS_NAME" value="com.mikepenz.adbfriend.MainKt" />
+    <module name="adbfriend-root.adbfriend-cli.main" />
+    <option name="PROGRAM_PARAMETERS" value="mcp server --tools" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

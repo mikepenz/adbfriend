@@ -6,31 +6,33 @@ import com.mikepenz.adbfriend.extensions.fetchModel
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import io.modelcontextprotocol.kotlin.sdk.server.Server
+import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.*
 
-fun Server.addConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Device>) {
-    addTool(
-        name = "get-connected-devices",
-        description = "The connected devices endpoint returns the list of connected android devices",
-        inputSchema = Tool.Input(
-            properties = JsonObject(
-                mapOf(
-                    "serial" to JsonObject(
-                        mapOf(
-                            "type" to JsonPrimitive("string"),
-                            "description" to JsonPrimitive("The Android device serial string to filter the output list")
-                        )
-                    ),
-                    "name" to JsonObject(
-                        mapOf(
-                            "type" to JsonPrimitive("string"),
-                            "description" to JsonPrimitive("The Android device model name to filter the output list")
-                        )
-                    ),
-                )
-            ),
-            required = listOf()
+fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Device>): RegisteredTool {
+    return RegisteredTool(
+        Tool(
+            name = "get-connected-devices",
+            description = "The connected devices endpoint returns the list of connected android devices",
+            inputSchema = Tool.Input(
+                properties = JsonObject(
+                    mapOf(
+                        "serial" to JsonObject(
+                            mapOf(
+                                "type" to JsonPrimitive("string"),
+                                "description" to JsonPrimitive("The Android device serial string to filter the output list")
+                            )
+                        ),
+                        "name" to JsonObject(
+                            mapOf(
+                                "type" to JsonPrimitive("string"),
+                                "description" to JsonPrimitive("The Android device model name to filter the output list")
+                            )
+                        ),
+                    )
+                ),
+                required = listOf()
+            )
         )
     ) { request ->
         val serial = request.arguments["serial"]?.jsonPrimitive?.content?.trim()
