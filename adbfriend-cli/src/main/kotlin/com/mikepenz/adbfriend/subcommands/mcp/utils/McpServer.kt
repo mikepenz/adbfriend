@@ -14,7 +14,6 @@ import kotlinx.io.buffered
 
 suspend fun setupServer(sseOptions: SseOptions?, builtTools: List<RegisteredTool>, echo: (String) -> Unit, enableLog: Boolean = false) {
     val server = configureServer(builtTools)
-    val sseOptions = sseOptions
     if (sseOptions?.sse == true) {
         if (enableLog) echo("Starting SSE MCP server on port ${sseOptions.port}")
         embeddedServer(CIO, host = "0.0.0.0", port = sseOptions.port) {
