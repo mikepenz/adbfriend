@@ -105,6 +105,7 @@ adbfriend mcp server --sse true
 | list_allowed_directories       | Lists directories that are allowed to be accessed by the file system tools.                   |
 | list-files                     | Lists files and directories on an Android device.                                             |
 | read-file                      | Reads the content of a file on an Android device.                                             |
+| read_multiple_files            | Reads the contents of multiple files on an Android device at once (reduces LLM calls).         |
 | write-file                     | Writes content to a file on an Android device.                                                |
 | create-directory               | Creates a directory on an Android device.                                                     |
 | delete                         | Deletes a file or directory on an Android device.                                             |

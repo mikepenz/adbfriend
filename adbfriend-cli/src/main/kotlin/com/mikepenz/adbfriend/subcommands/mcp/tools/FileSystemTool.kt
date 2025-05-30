@@ -387,6 +387,79 @@ private fun createMoveFileTool(
 }
 
 /**
+ * Creates a tool for reading multiple files at once on an Android device.
+ */
+private fun createReadMultipleFilesTool(
+    adb: AndroidDebugBridgeClient,
+    allowedPaths: List<String>
+): RegisteredTool = createTool(
+    name = "read_multiple_files",
+    description = """
+        Reads the contents of multiple files on the Android device at once.
+        Returns the file contents as text for each file.
+        This helps reduce the number of LLM calls needed when reading multiple files.
+    """.trimIndent(),
+    inputSchema = FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT
+) {
+    val serial = inputSerial
+    val paths = arguments["paths"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }
+        ?: throw ToolException("The 'paths' parameter is required and must be an array of strings.")
+
+    if (paths.isEmpty()) {
+        throw ToolException("At least one file path must be provided.")
+    }
+
+    // Verify all paths are allowed
+    paths.forEach { path ->
+        verifyPathAllowed(path, allowedPaths)
+    }
+
+    try {
+        val results = buildJsonObject {
+            put("files", buildJsonArray {
+                paths.forEach { path ->
+                    try {
+                        // Use cat command to read file contents
+                        val response = adb.execute(
+                            request = ShellCommandRequest("cat \"${path.escapeForSync()}\""),
+                            serial = serial
+                        )
+
+                        if (response.errorOutput.isNotBlank()) {
+                            add(buildJsonObject {
+                                put("path", JsonPrimitive(path))
+                                put("error", JsonPrimitive(response.errorOutput))
+                                put("success", JsonPrimitive(false))
+                            })
+                        } else {
+                            add(buildJsonObject {
+                                put("path", JsonPrimitive(path))
+                                put("content", JsonPrimitive(response.output))
+                                put("success", JsonPrimitive(true))
+                            })
+                        }
+                    } catch (e: Exception) {
+                        add(buildJsonObject {
+                            put("path", JsonPrimitive(path))
+                            put("error", JsonPrimitive(e.message ?: "Unknown error"))
+                            put("success", JsonPrimitive(false))
+                        })
+                    }
+                }
+            })
+        }
+
+        CallToolResult(
+            content = listOf(TextContent(results.toString()))
+        )
+    } catch (e: Exception) {
+        CallToolResult(
+            content = listOf(TextContent("Failed to read multiple files: ${e.message}"))
+        )
+    }
+}
+
+/**
  * Creates a tool for searching files with a case-insensitive glob pattern on an Android device.
  */
 private fun createSearchFilesTool(
@@ -472,6 +545,7 @@ fun createFileSystemTools(
     add(createListAllowedDirectoriesTool(allowedPaths))
     add(createListFilesTool(adb, allowedPaths))
     add(createReadFileTool(adb, allowedPaths))
+    add(createReadMultipleFilesTool(adb, allowedPaths))
     add(createWriteFileTool(adb, allowedPaths))
     add(createCreateDirectoryTool(adb, allowedPaths))
     add(createDeleteTool(adb, allowedPaths))
