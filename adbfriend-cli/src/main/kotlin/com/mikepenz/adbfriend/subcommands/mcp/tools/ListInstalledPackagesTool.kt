@@ -17,7 +17,11 @@ fun createGetInstalledPackagesTool(adb: AndroidDebugBridgeClient): RegisteredToo
     return RegisteredTool(
         Tool(
             name = "get-installed-packages",
-            description = "The get installed packages endpoint returns a list of installed packages on the Android device for the provided serial.",
+            description = """
+                Retrieves the information of all installed packages on the Android device for the provided serial.
+                For each installed package `packageName`, `version` and `dataDir` will be returned.
+                The `packageName` is the common identifier used to access any other package specific tool.
+            """.trimIndent(),
             inputSchema = DEVICE_FILTER_TOOL_INPUT
         )
     ) { request ->

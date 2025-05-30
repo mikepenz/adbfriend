@@ -14,7 +14,9 @@ fun createCheckAdbSpeedTool(): RegisteredTool {
     return RegisteredTool(
         Tool(
             name = "check-adb-speed",
-            description = "The check adb speed endpoint returns the usb connection speed of the Android device for the provided serial.",
+            description = """
+                Checks the usb connection speed of the Android device for the provided serial.
+            """.trimIndent(),
             inputSchema = DEVICE_FILTER_TOOL_INPUT
         )
     ) { request ->
