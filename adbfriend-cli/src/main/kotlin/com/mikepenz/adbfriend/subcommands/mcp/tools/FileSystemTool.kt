@@ -13,7 +13,6 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.findFilesOnDevice
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputPath
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
-import com.mikepenz.adbfriend.utils.convertGlobToRegex
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
@@ -358,24 +357,12 @@ private fun createSearchFilesTool(
     }
 
     try {
-        // Convert glob pattern to regex for case-insensitive matching
-        val regex = convertGlobToRegex(pattern).toString()
-
-        // Get all files of the device.
-        val allFoundFiles = if (path.isNullOrBlank()) {
-            allowedPaths.flatMap { adb.findFilesOnDevice(serial, it, recursive) }
+        // Get files matching the pattern directly from the device
+        val matchingFiles = if (path.isNullOrBlank()) {
+            allowedPaths.flatMap { adb.findFilesOnDevice(serial, it, pattern, recursive) }
         } else {
-            adb.findFilesOnDevice(serial, path, recursive)
-        }
-
-        // Filter the results using the regex pattern (case insensitive)
-        val caseInsensitiveRegex = Regex(regex, RegexOption.IGNORE_CASE)
-        val matchingFiles = allFoundFiles
-            .filter { it.isNotBlank() }
-            .filter { filePath ->
-                val fileName = filePath.substringAfterLast('/')
-                caseInsensitiveRegex.matches(fileName)
-            }
+            adb.findFilesOnDevice(serial, path, pattern, recursive)
+        }.filter { it.isNotBlank() }
 
         // Get details for each matching file
         val fileDetails = matchingFiles.mapNotNull { filePath ->
