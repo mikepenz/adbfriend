@@ -103,7 +103,7 @@ adbfriend mcp server --sse true
 | get-connected-devices          | Retrieves information about all connected Android devices including serial, model, and state. |
 | get-installed-packages         | Retrieves information about all installed packages on an Android device.                      |
 | list_allowed_directories       | Lists directories that are allowed to be accessed by the file system tools.                   |
-| list-files                     | Lists files and directories on an Android device.                                             |
+| list-files                     | Lists files and directories on an Android device. Supports recursive listing with the 'recursive' option. |
 | read-file                      | Reads the content of a file on an Android device.                                             |
 | read_multiple_files            | Reads the contents of multiple files on an Android device at once (reduces LLM calls).         |
 | write-file                     | Writes content to a file on an Android device.                                                |
