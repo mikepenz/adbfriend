@@ -97,3 +97,18 @@ internal val FILE_SYSTEM_MOVE_TOOL_INPUT = Tool.Input(
     },
     required = listOf("serial", "source", "destination")
 )
+
+// Input schema for reading multiple files
+internal val FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT = Tool.Input(
+    properties = buildJsonObject {
+        put("serial", SERIAL_INPUT)
+        put("paths", buildJsonObject {
+            put("type", JsonPrimitive("array"))
+            put("description", JsonPrimitive("The list of file paths on the Android device to read"))
+            put("items", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+            })
+        })
+    },
+    required = listOf("serial", "paths")
+)
