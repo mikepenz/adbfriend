@@ -13,7 +13,11 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
     return RegisteredTool(
         Tool(
             name = "get-connected-devices",
-            description = "The connected devices endpoint returns the list of connected android devices",
+            description = """
+                Retrieves the information of all android devices connected.
+                For each device `serial`, `model` and `state` will be returned.
+                The `serial` is the common identifier used to access any other device specific tool.
+            """.trimIndent(),
             inputSchema = Tool.Input(
                 properties = JsonObject(
                     mapOf(

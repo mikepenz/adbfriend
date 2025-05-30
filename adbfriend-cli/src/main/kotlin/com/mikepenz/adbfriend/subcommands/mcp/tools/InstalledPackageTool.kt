@@ -14,7 +14,10 @@ fun createInstalledPackageTools(adb: AndroidDebugBridgeClient) = buildList {
     addInstalledPackageTool(
         adb = adb,
         name = "clear-installed-package",
-        description = "The clear installed package endpoint clears an installed packages data for the provided packages names from the Android device for the provided serial.",
+        description = """
+            Clears the package data for the provided package names on the Android device for the provided serial.
+            Use with caution as it will clear the applications data without warning.
+        """.trimIndent(),
     ) { adb, serial, packageNames ->
         packageNames.associateWith { p ->
             adb.execute(
@@ -28,7 +31,10 @@ fun createInstalledPackageTools(adb: AndroidDebugBridgeClient) = buildList {
     addInstalledPackageTool(
         adb = adb,
         name = "set-immersive-full-for-package",
-        description = "The set immersive full for installed package endpoint sets the 'immersive-full' flag for the provided package names on the Android device for the provided serial.",
+        description = """
+            Sets the 'immersive-full' flag for the provided package names on the Android device for the provided serial.
+            This is commonly done as preparation for executing tests on the android device, to prevent the immersive info dialog to be displayed.
+        """.trimIndent(),
     ) { adb, serial, packageNames ->
         packageNames.associateWith { p ->
             adb.execute(
@@ -42,7 +48,10 @@ fun createInstalledPackageTools(adb: AndroidDebugBridgeClient) = buildList {
     addInstalledPackageTool(
         adb = adb,
         name = "force-stop-process",
-        description = "The force stop process endpoint force closes the process of the provided package names on the Android device for the provided serial.",
+        description = """
+            Forces the stop of the provided package names on the Android device for the provided serial.
+            Use with caution as it will stop the application without warning.
+        """.trimIndent(),
     ) { adb, serial, packageNames ->
         packageNames.associateWith { p ->
             adb.execute(
@@ -62,7 +71,11 @@ fun createInstalledPackageTools(adb: AndroidDebugBridgeClient) = buildList {
                 put("description", JsonPrimitive("Flag to keep the data when uninstalling the package. By default will also remove data."))
             },
         ),
-        description = "The uninstall package endpoint uninstalls the provided package names on the Android device for the provided serial, optionally keeping app data.",
+        description = """
+            Uninstalls the provided package names on the Android device for the provided serial.
+            Use with caution as it will uninstall the application without warning.
+            If the 'keep-data' flag is set to true, associated data will not be removed, and only the application will be uninstalled.
+        """.trimIndent(),
     ) { adb, serial, packageNames ->
         val keepData = arguments["keep-data"]?.jsonPrimitive?.booleanOrNull ?: false
 
