@@ -21,9 +21,7 @@ import java.nio.file.Files
 
 // Define allowed paths for security
 private val DEFAULT_ALLOWED_PATHS = listOf(
-    "/sdcard/",
-    "/storage/emulated/0/",
-    "/data/local/tmp/"
+    "/sdcard/Download/"
 )
 
 /**

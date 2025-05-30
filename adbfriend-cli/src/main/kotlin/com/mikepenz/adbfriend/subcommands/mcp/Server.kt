@@ -3,10 +3,7 @@ package com.mikepenz.adbfriend.subcommands.mcp
 import com.github.ajalt.clikt.core.Context
 import com.github.ajalt.clikt.parameters.groups.OptionGroup
 import com.github.ajalt.clikt.parameters.groups.cooccurring
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
 import com.malinskiy.adam.request.device.Device
@@ -22,17 +19,19 @@ class SseOptions : OptionGroup() {
 class Server : AdbCommand() {
     val sseOptions by SseOptions().cooccurring()
     val tools by option().flag()
+    val allowedPaths: List<String> by option(help = "List of allowed paths for file system operations").varargValues().default(emptyList())
 
     override val requireAdbServer = false
     override val failOnNoDevice = false
     override val enableLog = false
 
     override fun help(context: Context) = """
-        Starts up a MCP server.
+        Starts up a MCP server. The server provides tools for interacting with Android devices via ADB.
+        File system operations are restricted to the provided paths. (By default only `/sdcard/Download/`)
     """.trimIndent()
 
     override suspend fun runWithAdb(devices: List<Device>) {
-        val builtTools = buildTools(adb, devices)
+        val builtTools = buildTools(adb, devices, allowedPaths)
 
         if (tools) {
             echo()
