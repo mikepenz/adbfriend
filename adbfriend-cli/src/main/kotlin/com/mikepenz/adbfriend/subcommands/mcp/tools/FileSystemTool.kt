@@ -5,14 +5,10 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.Feature
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
-import com.malinskiy.adam.request.sync.v2.ListFileRequest
 import com.malinskiy.adam.request.sync.v2.PushFileRequest
 import com.mikepenz.adbfriend.extensions.escapeForSync
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
-import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
-import com.mikepenz.adbfriend.subcommands.mcp.utils.findFilesOnDevice
-import com.mikepenz.adbfriend.subcommands.mcp.utils.inputPath
-import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
+import com.mikepenz.adbfriend.subcommands.mcp.utils.*
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
@@ -34,10 +30,11 @@ internal val DEFAULT_ALLOWED_PATHS = listOf(
  * A path is allowed if it starts with any of the allowed paths.
  */
 private fun verifyPathAllowed(path: String, allowedPaths: List<String>) {
-    if (!allowedPaths.any { allowedPath -> path.startsWith(allowedPath) }) {
+    if (!allowedPaths.any { allowedPath -> path.startsWith(allowedPath) || "$path/".startsWith(allowedPath) }) {
         throw ToolException("Access to path '$path' is not allowed for security reasons. Allowed paths: ${allowedPaths.joinToString()}")
     }
 }
+
 
 /**
  * Creates a tool for listing files and directories on an Android device.
@@ -50,27 +47,31 @@ private fun createListFilesTool(
     description = """
         Lists files and directories at the specified path on the Android device.
         Returns information about each file/directory including name, size, type, and last modified time.
+        Use the 'recursive' parameter to list files in subdirectories recursively.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_RECURSIVE_TOOL_INPUT
 ) {
     val serial = inputSerial
     val path = inputPath
+    val recursive = arguments["recursive"]?.jsonPrimitive?.booleanOrNull ?: false
     verifyPathAllowed(path, allowedPaths)
 
     try {
-        val files = adb.execute(
-            ListFileRequest(path, listOf(Feature.LS_V2, Feature.STAT_V2)),
-            serial = serial
-        )
+        // Get all files using the common listFiles function
+        val allFiles = adb.listFiles(serial, path, allowedPaths, recursive)
 
+        // Build the result JSON
         val result = buildJsonObject {
             put("path", JsonPrimitive(path))
+            put("recursive", JsonPrimitive(recursive))
             put("files", buildJsonArray {
-                files.forEach { file ->
-                    if (file.name != null) {
+                allFiles.forEach { (parentPath, file) ->
+                    if (file.name != null && file.name != "." && file.name != "..") {
+                        val filePath = if (parentPath.endsWith("/")) "$parentPath${file.name}" else "$parentPath/${file.name}"
                         add(buildJsonObject {
                             put("name", JsonPrimitive(file.name))
-                            put("size", JsonPrimitive(file.size))
+                            put("path", JsonPrimitive(filePath))
+                            put("size", JsonPrimitive(file.size()))
                             put("isDirectory", JsonPrimitive(file.isDirectory()))
                             put("lastModified", JsonPrimitive(file.mtime.epochSecond))
                         })

@@ -1,7 +1,9 @@
 package com.mikepenz.adbfriend.subcommands.mcp.utils
 
 import com.malinskiy.adam.AndroidDebugBridgeClient
+import com.malinskiy.adam.request.Feature
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.malinskiy.adam.request.sync.v2.ListFileRequest
 import com.mikepenz.adbfriend.extensions.escapeForSync
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
 
@@ -47,4 +49,50 @@ suspend fun AndroidDebugBridgeClient.findFilesOnDevice(
     }
 
     return response.output.lines()
+}
+
+
+/**
+ * Lists files and directories at the specified path on an Android device.
+ * Can optionally list files recursively in subdirectories.
+ */
+internal suspend fun AndroidDebugBridgeClient.listFiles(
+    serial: String,
+    path: String,
+    allowedPaths: List<String>,
+    recursive: Boolean = false
+): List<Pair<String, com.malinskiy.adam.request.sync.model.FileEntry>> {
+    val allFiles = mutableListOf<Pair<String, com.malinskiy.adam.request.sync.model.FileEntry>>()
+
+    try {
+        // Get the list of files at the current path
+        val files = execute(
+            ListFileRequest(path, listOf(Feature.LS_V2, Feature.STAT_V2)),
+            serial = serial
+        )
+
+        // Process each file
+        files.forEach { file ->
+            if (file.name != null) {
+                // Add the file to the result list
+                allFiles.add(path to file)
+
+                // If recursive and this is a directory, process its contents
+                if (recursive && file.isDirectory() && file.name != "." && file.name != "..") {
+                    val subPath = if (path.endsWith("/")) "$path${file.name}" else "$path/${file.name}"
+
+                    try {
+                        // Recursively list files in the subdirectory
+                        allFiles.addAll(listFiles(serial, subPath, allowedPaths, true))
+                    } catch (e: Exception) {
+                        // Skip this directory if not allowed or if there's an error
+                    }
+                }
+            }
+        }
+    } catch (e: Exception) {
+        // Skip this directory if there's an error
+    }
+
+    return allFiles
 }
