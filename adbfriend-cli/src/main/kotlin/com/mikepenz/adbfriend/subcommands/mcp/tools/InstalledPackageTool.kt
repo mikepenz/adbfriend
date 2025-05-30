@@ -7,6 +7,7 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import kotlinx.serialization.json.*
 
 
@@ -106,57 +107,58 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
     block: suspend CallToolRequest.(adb: AndroidDebugBridgeClient, serial: String, packageNames: Array<String>) -> Map<String, Boolean>
 ) {
     add(
-        RegisteredTool(
-            Tool(
-                name = name, description = description, inputSchema = Tool.Input(
-                    properties = buildJsonObject {
-                        extraProperties.onEach { put(it.key, it.value) }
-                        put("serial", buildJsonObject {
+        createTool(
+            name = name,
+            description = description,
+            inputSchema = Tool.Input(
+                properties = buildJsonObject {
+                    extraProperties.onEach { put(it.key, it.value) }
+                    put("serial", buildJsonObject {
+                        put("type", JsonPrimitive("string"))
+                        put("description", JsonPrimitive("The Android device serial string to filter the output list"))
+                    })
+                    put("package-names", buildJsonObject {
+                        put("type", JsonPrimitive("array"))
+                        put("items", buildJsonObject {
                             put("type", JsonPrimitive("string"))
-                            put("description", JsonPrimitive("The Android device serial string to filter the output list"))
                         })
-                        put("package-names", buildJsonObject {
-                            put("type", JsonPrimitive("array"))
-                            put("items", buildJsonObject {
-                                put("type", JsonPrimitive("string"))
-                            })
-                            put("description", JsonPrimitive("The array of package names to clear the data for."))
-                        })
-                    }, required = listOf(
-                        "serial", "package-names"
-                    )
+                        put("description", JsonPrimitive("The array of package names to clear the data for."))
+                    })
+                }, 
+                required = listOf(
+                    "serial", "package-names"
                 )
             )
-        ) { request ->
-            val serial = request.arguments["serial"]?.jsonPrimitive?.content?.trim()
-            val packageNames = request.arguments["package-names"]?.jsonArray
+        ) {
+            val serial = arguments["serial"]?.jsonPrimitive?.content?.trim()
+            val packageNames = arguments["package-names"]?.jsonArray
 
             if (serial.isNullOrBlank()) {
-                return@RegisteredTool CallToolResult(
+                CallToolResult(
                     content = listOf(TextContent("The 'serial' parameter is required."))
                 )
             } else if (packageNames.isNullOrEmpty()) {
-                return@RegisteredTool CallToolResult(
+                CallToolResult(
                     content = listOf(TextContent("The 'package-names' parameter is required."))
                 )
+            } else {
+                val results = block(adb, serial, packageNames.map { it.jsonPrimitive.content }.toTypedArray())
+
+                val result = buildJsonObject {
+                    put("results", buildJsonArray {
+                        results.onEach { (packageName, result) ->
+                            add(buildJsonObject {
+                                put("packageName", JsonPrimitive(packageName))
+                                put("successful", JsonPrimitive(result))
+                            })
+                        }
+                    })
+                }
+
+                CallToolResult(
+                    content = listOf(TextContent(result.toString()))
+                )
             }
-
-            val results = request.block(adb, serial, packageNames.map { it.jsonPrimitive.content }.toTypedArray())
-
-            val result = buildJsonObject {
-                put("results", buildJsonArray {
-                    results.onEach { (packageName, result) ->
-                        add(buildJsonObject {
-                            put("packageName", JsonPrimitive(packageName))
-                            put("successful", JsonPrimitive(result))
-                        })
-                    }
-                })
-            }
-
-            CallToolResult(
-                content = listOf(TextContent(result.toString()))
-            )
         }
     )
 }
