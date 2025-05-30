@@ -350,7 +350,7 @@ private fun createSearchFilesTool(
     val path = arguments["path"]?.jsonPrimitive?.content
     val pattern = arguments["pattern"]?.jsonPrimitive?.content
         ?: throw ToolException("The 'pattern' parameter is required.")
-    val recursive = arguments["recursive"]?.jsonPrimitive?.booleanOrNull ?: true
+    val recursive = arguments["recursive"]?.jsonPrimitive?.booleanOrNull ?: false
 
     if (!path.isNullOrBlank()) {
         verifyPathAllowed(path, allowedPaths)
