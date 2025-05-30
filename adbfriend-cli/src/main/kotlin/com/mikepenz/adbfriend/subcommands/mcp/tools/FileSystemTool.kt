@@ -57,8 +57,6 @@ private fun createListFilesTool(
     verifyPathAllowed(path, allowedPaths)
 
     try {
-        verifyPathAllowed(path, allowedPaths)
-
         // Get all files using the common listFiles function
         val allFiles = adb.listFiles(serial, path, allowedPaths, recursive)
 
