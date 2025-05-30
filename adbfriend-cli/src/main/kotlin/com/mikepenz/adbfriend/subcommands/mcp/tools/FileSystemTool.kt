@@ -333,6 +333,60 @@ private fun createListAllowedDirectoriesTool(
 }
 
 /**
+ * Creates a tool for moving files on an Android device.
+ */
+private fun createMoveFileTool(
+    adb: AndroidDebugBridgeClient,
+    allowedPaths: List<String>
+): RegisteredTool = createTool(
+    name = "move_file",
+    description = """
+        Moves a file from the source path to the destination path on the Android device.
+        Both source and destination paths must be within the allowed paths.
+        Use caution as this can overwrite important files on the device.
+    """.trimIndent(),
+    inputSchema = FILE_SYSTEM_MOVE_TOOL_INPUT
+) {
+    val serial = inputSerial
+    val sourcePath = arguments["source"]?.jsonPrimitive?.content
+        ?: throw ToolException("The 'source' parameter is required.")
+    val destinationPath = arguments["destination"]?.jsonPrimitive?.content
+        ?: throw ToolException("The 'destination' parameter is required.")
+
+    // Verify both paths are allowed
+    verifyPathAllowed(sourcePath, allowedPaths)
+    verifyPathAllowed(destinationPath, allowedPaths)
+
+    try {
+        // Use mv command to move the file
+        val response = adb.execute(
+            request = ShellCommandRequest("mv \"${sourcePath.escapeForSync()}\" \"${destinationPath.escapeForSync()}\""),
+            serial = serial
+        )
+
+        if (response.errorOutput.isNotBlank()) {
+            CallToolResult(
+                content = listOf(TextContent("Failed to move file: ${response.errorOutput}"))
+            )
+        } else {
+            val result = buildJsonObject {
+                put("source", JsonPrimitive(sourcePath))
+                put("destination", JsonPrimitive(destinationPath))
+                put("success", JsonPrimitive(true))
+            }
+
+            CallToolResult(
+                content = listOf(TextContent(result.toString()))
+            )
+        }
+    } catch (e: Exception) {
+        CallToolResult(
+            content = listOf(TextContent("Failed to move file: ${e.message}"))
+        )
+    }
+}
+
+/**
  * Creates a tool for searching files with a case-insensitive glob pattern on an Android device.
  */
 private fun createSearchFilesTool(
@@ -421,5 +475,6 @@ fun createFileSystemTools(
     add(createWriteFileTool(adb, allowedPaths))
     add(createCreateDirectoryTool(adb, allowedPaths))
     add(createDeleteTool(adb, allowedPaths))
+    add(createMoveFileTool(adb, allowedPaths))
     add(createSearchFilesTool(adb, allowedPaths))
 }

@@ -109,6 +109,7 @@ adbfriend mcp server --sse true
 | create-directory               | Creates a directory on an Android device.                                                     |
 | delete                         | Deletes a file or directory on an Android device.                                             |
 | search-files                   | Searches for files matching a case-insensitive glob pattern within allowed directories.       |
+| move_file                      | Moves a file from the source path to the destination path on an Android device.              |
 
 With many more tools planned for the future.
 

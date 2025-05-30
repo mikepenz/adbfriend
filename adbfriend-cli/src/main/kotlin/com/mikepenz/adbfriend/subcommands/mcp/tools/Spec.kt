@@ -81,3 +81,19 @@ internal val FILE_SYSTEM_SEARCH_TOOL_INPUT = Tool.Input(
     },
     required = listOf("serial", "pattern")
 )
+
+// Input schema for file move operations
+internal val FILE_SYSTEM_MOVE_TOOL_INPUT = Tool.Input(
+    properties = buildJsonObject {
+        put("serial", SERIAL_INPUT)
+        put("source", buildJsonObject {
+            put("type", JsonPrimitive("string"))
+            put("description", JsonPrimitive("The source file path on the Android device"))
+        })
+        put("destination", buildJsonObject {
+            put("type", JsonPrimitive("string"))
+            put("description", JsonPrimitive("The destination file path on the Android device"))
+        })
+    },
+    required = listOf("serial", "source", "destination")
+)
