@@ -108,6 +108,7 @@ adbfriend mcp server --sse true
 | write-file                     | Writes content to a file on an Android device.                                                |
 | create-directory               | Creates a directory on an Android device.                                                     |
 | delete                         | Deletes a file or directory on an Android device.                                             |
+| search-files                   | Searches for files matching a case-insensitive glob pattern within allowed directories.       |
 
 With many more tools planned for the future.
 

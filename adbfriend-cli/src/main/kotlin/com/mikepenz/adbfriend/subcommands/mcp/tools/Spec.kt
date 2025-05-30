@@ -64,3 +64,20 @@ internal val FILE_SYSTEM_RECURSIVE_TOOL_INPUT = Tool.Input(
     },
     required = listOf("serial", "path")
 )
+
+// Input schema for file search operations
+internal val FILE_SYSTEM_SEARCH_TOOL_INPUT = Tool.Input(
+    properties = buildJsonObject {
+        put("serial", SERIAL_INPUT)
+        put("path", PATH_INPUT)
+        put("pattern", buildJsonObject {
+            put("type", JsonPrimitive("string"))
+            put("description", JsonPrimitive("The glob pattern to search for files (case insensitive)"))
+        })
+        put("recursive", buildJsonObject {
+            put("type", JsonPrimitive("boolean"))
+            put("description", JsonPrimitive("Whether to search recursively in subdirectories"))
+        })
+    },
+    required = listOf("serial", "pattern")
+)
