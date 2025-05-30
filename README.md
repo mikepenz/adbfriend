@@ -14,6 +14,7 @@ Its features were mostly designed for developers, but it can be useful for every
     - Apply the immersive flag to all packages matching glob, force-stop, clear app data & cache
 - Extra tools
     - adb-speed (Helps to identify sub-par cables)
+- Model Context Protocol [MCP](https://modelcontextprotocol.io/) Server
 
 ## Install
 
@@ -92,13 +93,21 @@ adbfriend mcp server --sse true
 
 ### Supported tools
 
-- get-connected-devices
-- get-installed-packages
-- check-adb-speed
-- clear-installed-package
-- set-immersive-full-for-package
-- force-stop-process
-- uninstall-package
+| Tool Name                      | Description                                                                                   |
+|--------------------------------|-----------------------------------------------------------------------------------------------|
+| check-adb-speed                | Checks the USB connection speed of an Android device for the provided serial.                 |
+| clear-installed-package        | Clears the package data for provided package names on an Android device.                      |
+| set-immersive-full-for-package | Sets the 'immersive-full' flag for provided package names on an Android device.               |
+| force-stop-process             | Forces the stop of provided package names on an Android device.                               |
+| uninstall-package              | Uninstalls provided package names on an Android device.                                       |
+| get-connected-devices          | Retrieves information about all connected Android devices including serial, model, and state. |
+| get-installed-packages         | Retrieves information about all installed packages on an Android device.                      |
+| list_allowed_directories       | Lists directories that are allowed to be accessed by the file system tools.                   |
+| list-files                     | Lists files and directories on an Android device.                                             |
+| read-file                      | Reads the content of a file on an Android device.                                             |
+| write-file                     | Writes content to a file on an Android device.                                                |
+| create-directory               | Creates a directory on an Android device.                                                     |
+| delete                         | Deletes a file or directory on an Android device.                                             |
 
 With many more tools planned for the future.
 
@@ -153,7 +162,7 @@ from [ajalt](https://github.com/ajalt/).
 
 ```
 Copyright 2025 Mike Penz
- 
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
