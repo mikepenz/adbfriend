@@ -8,4 +8,5 @@ fun buildTools(adb: AndroidDebugBridgeClient, devices: List<Device>) = buildList
     addAll(createInstalledPackageTools(adb))
     add(createConnectedDevicesTool(adb, devices))
     add(createGetInstalledPackagesTool(adb))
+    addAll(createFileSystemTools(adb))
 }
