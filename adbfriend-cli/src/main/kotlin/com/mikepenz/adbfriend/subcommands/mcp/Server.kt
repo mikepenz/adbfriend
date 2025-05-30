@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.types.boolean
 import com.github.ajalt.clikt.parameters.types.int
 import com.malinskiy.adam.request.device.Device
 import com.mikepenz.adbfriend.subcommands.AdbCommand
+import com.mikepenz.adbfriend.subcommands.mcp.tools.DEFAULT_ALLOWED_PATHS
 import com.mikepenz.adbfriend.subcommands.mcp.tools.buildTools
 import com.mikepenz.adbfriend.subcommands.mcp.utils.setupServer
 
@@ -19,7 +20,7 @@ class SseOptions : OptionGroup() {
 class Server : AdbCommand() {
     val sseOptions by SseOptions().cooccurring()
     val tools by option().flag()
-    val allowedPaths: List<String> by option(help = "List of allowed paths for file system operations").varargValues().default(emptyList())
+    val allowedPaths: List<String> by option(help = "List of allowed paths for file system operations").varargValues().default(DEFAULT_ALLOWED_PATHS)
 
     override val requireAdbServer = false
     override val failOnNoDevice = false

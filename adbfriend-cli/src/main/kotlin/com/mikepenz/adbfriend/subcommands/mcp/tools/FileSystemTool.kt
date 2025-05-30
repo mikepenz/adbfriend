@@ -10,6 +10,7 @@ import com.malinskiy.adam.request.sync.v2.PushFileRequest
 import com.mikepenz.adbfriend.extensions.escapeForSync
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
+import com.mikepenz.adbfriend.subcommands.mcp.utils.findFilesOnDevice
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputPath
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
@@ -24,7 +25,7 @@ import kotlinx.serialization.json.*
 import java.nio.file.Files
 
 // Define allowed paths for security
-private val DEFAULT_ALLOWED_PATHS = listOf(
+internal val DEFAULT_ALLOWED_PATHS = listOf(
     "/sdcard/Download/"
 )
 
@@ -332,6 +333,78 @@ private fun createListAllowedDirectoriesTool(
 }
 
 /**
+ * Creates a tool for searching files with a case-insensitive glob pattern on an Android device.
+ */
+private fun createSearchFilesTool(
+    adb: AndroidDebugBridgeClient,
+    allowedPaths: List<String>
+): RegisteredTool = createTool(
+    name = "search-files",
+    description = """
+        Searches for files matching a case-insensitive glob pattern within the specified path or alternative within the allowed paths on the Android device.
+        Returns information about each matching file including name, path, size, type.
+    """.trimIndent(),
+    inputSchema = FILE_SYSTEM_SEARCH_TOOL_INPUT
+) {
+    val serial = inputSerial
+    val path = arguments["path"]?.jsonPrimitive?.content
+    val pattern = arguments["pattern"]?.jsonPrimitive?.content
+        ?: throw ToolException("The 'pattern' parameter is required.")
+    val recursive = arguments["recursive"]?.jsonPrimitive?.booleanOrNull ?: false
+
+    if (!path.isNullOrBlank()) {
+        verifyPathAllowed(path, allowedPaths)
+    }
+
+    try {
+        // Get files matching the pattern directly from the device
+        val matchingFiles = if (path.isNullOrBlank()) {
+            allowedPaths.flatMap { adb.findFilesOnDevice(serial, it, pattern, recursive) }
+        } else {
+            adb.findFilesOnDevice(serial, path, pattern, recursive)
+        }.filter { it.isNotBlank() }
+
+        // Get details for each matching file
+        val fileDetails = matchingFiles.mapNotNull { filePath ->
+            try {
+                val fileResponse = adb.execute(
+                    request = ShellCommandRequest("ls -la \"${filePath.escapeForSync()}\""),
+                    serial = serial
+                )
+
+                val isDirectory = fileResponse.output.contains("d")
+                val size = fileResponse.output.split("\\s+".toRegex()).getOrNull(4)?.toLongOrNull() ?: 0
+
+                buildJsonObject {
+                    put("name", JsonPrimitive(filePath.substringAfterLast('/')))
+                    put("path", JsonPrimitive(filePath))
+                    put("size", JsonPrimitive(size))
+                    put("isDirectory", JsonPrimitive(isDirectory))
+                }
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        val result = buildJsonObject {
+            put("basePath", JsonPrimitive(path))
+            put("pattern", JsonPrimitive(pattern))
+            put("matchingFiles", buildJsonArray {
+                fileDetails.forEach { add(it) }
+            })
+        }
+
+        CallToolResult(
+            content = listOf(TextContent(result.toString()))
+        )
+    } catch (e: Exception) {
+        CallToolResult(
+            content = listOf(TextContent("Failed to search files: ${e.message}"))
+        )
+    }
+}
+
+/**
  * Creates a set of file system tools for working with files on an Android device.
  *
  * @param adb The ADB client to use for communication with the device
@@ -348,4 +421,5 @@ fun createFileSystemTools(
     add(createWriteFileTool(adb, allowedPaths))
     add(createCreateDirectoryTool(adb, allowedPaths))
     add(createDeleteTool(adb, allowedPaths))
+    add(createSearchFilesTool(adb, allowedPaths))
 }
