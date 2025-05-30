@@ -306,7 +306,7 @@ private fun createDeleteTool(
 private fun createListAllowedDirectoriesTool(
     allowedPaths: List<String>
 ): RegisteredTool = createTool(
-    name = "list_allowed_directories",
+    name = "list-allowed-directories",
     description = """
         Lists the directories that are allowed to be accessed by the file system tools.
         Use this to understand which directories are available before trying to access files.
@@ -339,7 +339,7 @@ private fun createMoveFileTool(
     adb: AndroidDebugBridgeClient,
     allowedPaths: List<String>
 ): RegisteredTool = createTool(
-    name = "move_file",
+    name = "move-file",
     description = """
         Moves a file from the source path to the destination path on the Android device.
         Both source and destination paths must be within the allowed paths.
@@ -393,7 +393,7 @@ private fun createReadMultipleFilesTool(
     adb: AndroidDebugBridgeClient,
     allowedPaths: List<String>
 ): RegisteredTool = createTool(
-    name = "read_multiple_files",
+    name = "read-multiple-files",
     description = """
         Reads the contents of multiple files on the Android device at once.
         Returns the file contents as text for each file.
