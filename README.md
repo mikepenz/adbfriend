@@ -101,7 +101,7 @@ adbfriend mcp server --sse true
 | force-stop-process             | Forces the stop of provided package names on an Android device.                                           |
 | uninstall-package              | Uninstalls provided package names on an Android device.                                                   |
 | get-connected-devices          | Retrieves information about all connected Android devices including serial, model, and state.             |
-| get-installed-packages         | Retrieves information about all installed packages on an Android device.                                  |
+| get-installed-packages         | Retrieves information about all installed packages on an Android device. Supports filtering for third-party apps only. |
 | list_allowed_directories       | Lists directories that are allowed to be accessed by the file system tools.                               |
 | list-files                     | Lists files and directories on an Android device. Supports recursive listing with the 'recursive' option. |
 | read-file                      | Reads the content of a file on an Android device.                                                         |

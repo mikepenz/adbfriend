@@ -30,7 +30,12 @@ internal val DEVICE_FILTER_TOOL_INPUT = Tool.Input(
     properties = JsonObject(
         mapOf(
             "serial" to SERIAL_INPUT,
-            "package-filter" to PACKAGE_FILTER_INPUT
+            "package-filter" to PACKAGE_FILTER_INPUT,
+            "third-party-only" to buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("If true, only third-party applications will be included in the results"))
+                put("default", JsonPrimitive(true))
+            }
         )
     ),
     required = listOf("serial")
