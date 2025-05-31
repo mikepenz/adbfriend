@@ -111,6 +111,7 @@ adbfriend mcp server --sse true
 | delete                         | Deletes a file or directory on an Android device.                                             |
 | search-files                   | Searches for files matching a case-insensitive glob pattern within allowed directories.       |
 | move_file                      | Moves a file from the source path to the destination path on an Android device.              |
+| capture-screenshot             | Captures a screenshot from an Android device and saves it to the host system.                |
 
 With many more tools planned for the future.
 
