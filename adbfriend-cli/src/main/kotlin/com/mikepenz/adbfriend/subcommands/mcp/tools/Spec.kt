@@ -20,6 +20,12 @@ internal val PATH_INPUT = buildJsonObject {
     put("description", JsonPrimitive("The file path on the Android device"))
 }
 
+internal val OUTPUT_PATH_INPUT = buildJsonObject {
+    put("type", JsonPrimitive("string"))
+    put("description", JsonPrimitive("The path on the host system where the file should be saved. If not provided, a default path will be used."))
+}
+
+
 internal val DEVICE_FILTER_TOOL_INPUT = Tool.Input(
     properties = JsonObject(
         mapOf(
@@ -111,4 +117,12 @@ internal val FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT = Tool.Input(
         })
     },
     required = listOf("serial", "paths")
+)
+
+internal val CAPTURE_SCREENSHOT_TOOL_INPUT = Tool.Input(
+    properties = buildJsonObject {
+        put("serial", SERIAL_INPUT)
+        put("output-path", OUTPUT_PATH_INPUT)
+    },
+    required = listOf("serial", "output-path")
 )

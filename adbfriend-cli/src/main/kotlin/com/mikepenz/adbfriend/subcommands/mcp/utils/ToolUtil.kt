@@ -39,3 +39,8 @@ val CallToolRequest.inputSerial: String
 val CallToolRequest.inputPath: String
     get() = arguments["path"]?.jsonPrimitive?.content ?: throw ToolException("The 'path' parameter is required.")
 
+val CallToolRequest.inputContent: String
+    get() = arguments["content"]?.jsonPrimitive?.content ?: throw ToolException("The 'content' parameter is required.")
+
+val CallToolRequest.inputOutputPath: String
+    get() = arguments["output-path"]?.jsonPrimitive?.content ?: throw ToolException("The 'output-path' parameter is required.")

@@ -20,22 +20,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
 import java.nio.file.Files
 
-// Define allowed paths for security
-internal val DEFAULT_ALLOWED_PATHS = listOf(
-    "/sdcard/Download/"
-)
-
-/**
- * Checks if a path is allowed based on the provided allowed paths list.
- * A path is allowed if it starts with any of the allowed paths.
- */
-private fun verifyPathAllowed(path: String, allowedPaths: List<String>) {
-    if (!allowedPaths.any { allowedPath -> path.startsWith(allowedPath) || "$path/".startsWith(allowedPath) }) {
-        throw ToolException("Access to path '$path' is not allowed for security reasons. Allowed paths: ${allowedPaths.joinToString()}")
-    }
-}
-
-
 /**
  * Creates a tool for listing files and directories on an Android device.
  */
@@ -153,8 +137,7 @@ private fun createWriteFileTool(
 ) {
     val serial = inputSerial
     val path = inputPath
-    val content = arguments["content"]?.jsonPrimitive?.content
-        ?: throw ToolException("The 'content' parameter is required.")
+    val content = inputContent
 
     verifyPathAllowed(path, allowedPaths)
 
