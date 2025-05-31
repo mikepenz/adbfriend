@@ -20,7 +20,8 @@ class SseOptions : OptionGroup() {
 class Server : AdbCommand() {
     val sseOptions by SseOptions().cooccurring()
     val tools by option().flag()
-    val allowedPaths: List<String> by option(help = "List of allowed paths for file system operations").varargValues().default(DEFAULT_ALLOWED_PATHS)
+    val allowedPaths: List<String> by option(help = "List of allowed paths for file system operations on the Android device").varargValues().default(DEFAULT_ALLOWED_PATHS)
+    val hostAllowedPaths: List<String>? by option(help = "List of allowed paths for file system operations on the host system").varargValues()
 
     override val requireAdbServer = false
     override val failOnNoDevice = false
@@ -28,11 +29,12 @@ class Server : AdbCommand() {
 
     override fun help(context: Context) = """
         Starts up a MCP server. The server provides tools for interacting with Android devices via ADB.
-        File system operations are restricted to the provided paths. (By default only `/sdcard/Download/`)
+        File system operations on the Android device are restricted to the provided paths. (By default only `/sdcard/Download/`)
+        File system operations on the host system are restricted to the provided host paths. (By default only `~/adbfriend/`)
     """.trimIndent()
 
     override suspend fun runWithAdb(devices: List<Device>) {
-        val builtTools = buildTools(adb, devices, allowedPaths)
+        val builtTools = buildTools(adb, devices, allowedPaths, hostAllowedPaths)
 
         if (tools) {
             echo()
