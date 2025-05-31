@@ -141,3 +141,14 @@ internal val CAPTURE_SCREENSHOT_TOOL_INPUT = Tool.Input(
     },
     required = listOf("serial", "output-path")
 )
+
+internal val INSTALL_APK_TOOL_INPUT = Tool.Input(
+    properties = buildJsonObject {
+        put("serial", SERIAL_INPUT)
+        put("apk-path", buildJsonObject {
+            put("type", JsonPrimitive("string"))
+            put("description", JsonPrimitive("The path to the APK file on the host system"))
+        })
+    },
+    required = listOf("serial", "apk-path")
+)

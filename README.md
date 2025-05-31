@@ -113,6 +113,7 @@ adbfriend mcp server --sse true
 | move_file                      | Moves a file from the source path to the destination path on an Android device.                           |
 | copy-file-to-host              | Copies a binary file from the Android device to the host system.                                          |
 | capture-screenshot             | Captures a screenshot from an Android device and saves it to the host system.                             |
+| install-apk                    | Installs an APK on the Android device from a file on the host system within the allowed host paths.       |
 
 With many more tools planned for the future.
 
