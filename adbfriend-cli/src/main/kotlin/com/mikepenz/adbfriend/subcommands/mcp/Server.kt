@@ -10,6 +10,7 @@ import com.malinskiy.adam.request.device.Device
 import com.mikepenz.adbfriend.subcommands.AdbCommand
 import com.mikepenz.adbfriend.subcommands.mcp.tools.DEFAULT_ALLOWED_PATHS
 import com.mikepenz.adbfriend.subcommands.mcp.tools.buildTools
+import com.mikepenz.adbfriend.subcommands.mcp.tools.getDefaultHostAllowedPaths
 import com.mikepenz.adbfriend.subcommands.mcp.utils.setupServer
 
 class SseOptions : OptionGroup() {
@@ -21,7 +22,7 @@ class Server : AdbCommand() {
     val sseOptions by SseOptions().cooccurring()
     val tools by option().flag()
     val allowedPaths: List<String> by option(help = "List of allowed paths for file system operations on the Android device").varargValues().default(DEFAULT_ALLOWED_PATHS)
-    val hostAllowedPaths: List<String>? by option(help = "List of allowed paths for file system operations on the host system").varargValues()
+    val hostAllowedPaths: List<String> by option(help = "List of allowed paths for file system operations on the host system").varargValues().default(getDefaultHostAllowedPaths())
 
     override val requireAdbServer = false
     override val failOnNoDevice = false

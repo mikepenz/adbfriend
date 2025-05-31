@@ -44,3 +44,6 @@ val CallToolRequest.inputContent: String
 
 val CallToolRequest.inputOutputPath: String
     get() = arguments["output-path"]?.jsonPrimitive?.content ?: throw ToolException("The 'output-path' parameter is required.")
+
+val CallToolRequest.inputApkPath: String
+    get() = arguments["apk-path"]?.jsonPrimitive?.content ?: throw ToolException("The 'apk-path' parameter is required.")

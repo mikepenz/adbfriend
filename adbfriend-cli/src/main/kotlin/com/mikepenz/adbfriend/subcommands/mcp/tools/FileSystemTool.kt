@@ -295,28 +295,47 @@ private fun createListAllowedDirectoriesTool(
 ): RegisteredTool = createTool(
     name = "list-allowed-directories",
     description = """
-        Lists the directories that are allowed to be accessed by the file system tools.
-        Use this to understand which directories are available before trying to access files.
+        Lists the directories on the Android device that are allowed to be accessed by the file system tools.
+        Use this to understand which directories are available on the Android device before trying to access files.
+        This API does not return information about allowed paths on the host system.
     """.trimIndent(),
     inputSchema = Tool.Input()
 ) {
-    try {
-        val result = buildJsonObject {
+    CallToolResult(
+        content = listOf(TextContent(buildJsonObject {
             put("allowedDirectories", buildJsonArray {
                 allowedPaths.forEach { path ->
                     add(JsonPrimitive(path))
                 }
             })
-        }
+        }.toString()))
+    )
+}
 
-        CallToolResult(
-            content = listOf(TextContent(result.toString()))
-        )
-    } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to list allowed directories: ${e.message}"))
-        )
-    }
+
+/**
+ * Creates a tool for listing allowed directories on an Android device.
+ */
+private fun createListAllowedHostDirectoriesTool(
+    hostAllowedPaths: List<String>
+): RegisteredTool = createTool(
+    name = "list-allowed-host-directories",
+    description = """
+        Lists the directories on the host system that are allowed to be accessed by the file system tools.
+        Use this to understand which directories are available on the host system before trying to access files.
+        This API does not return information about allowed paths on the android device.
+    """.trimIndent(),
+    inputSchema = Tool.Input()
+) {
+    CallToolResult(
+        content = listOf(TextContent(buildJsonObject {
+            put("allowedDirectories", buildJsonArray {
+                hostAllowedPaths.forEach { path ->
+                    add(JsonPrimitive(path))
+                }
+            })
+        }.toString()))
+    )
 }
 
 /**
@@ -455,7 +474,7 @@ private fun createSearchFilesTool(
 ): RegisteredTool = createTool(
     name = "search-files",
     description = """
-        Searches for files matching a case-insensitive glob pattern within the specified path or alternative within the allowed paths on the Android device.
+        Searches for files on the Android device matching a case-insensitive glob pattern within the specified path or alternative within the allowed paths on the Android device.
         Returns information about each matching file including name, path, size, type.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_SEARCH_TOOL_INPUT
@@ -524,7 +543,7 @@ private fun createSearchFilesTool(
 private fun createCopyFileToHostTool(
     adb: AndroidDebugBridgeClient,
     allowedPaths: List<String>,
-    hostAllowedPaths: List<String>? = null
+    hostAllowedPaths: List<String>
 ): RegisteredTool = createTool(
     name = "copy-file-to-host",
     description = """
@@ -542,7 +561,7 @@ private fun createCopyFileToHostTool(
     // Verify device path is allowed
     verifyPathAllowed(path, allowedPaths)
     // Use provided host allowed paths or default if not provided
-    verifyHostPathAllowed(outputPath, hostAllowedPaths ?: getDefaultHostAllowedPaths())
+    verifyHostPathAllowed(outputPath, hostAllowedPaths)
 
     // Ensure the output directory exists
     val directory = File(outputPath).parentFile
@@ -596,9 +615,10 @@ private fun createCopyFileToHostTool(
 fun createFileSystemTools(
     adb: AndroidDebugBridgeClient,
     allowedPaths: List<String> = DEFAULT_ALLOWED_PATHS,
-    hostAllowedPaths: List<String>? = null
+    hostAllowedPaths: List<String> = getDefaultHostAllowedPaths(),
 ): List<RegisteredTool> = buildList {
     add(createListAllowedDirectoriesTool(allowedPaths))
+    add(createListAllowedHostDirectoriesTool(hostAllowedPaths))
     add(createListFilesTool(adb, allowedPaths))
     add(createReadFileTool(adb, allowedPaths))
     add(createReadMultipleFilesTool(adb, allowedPaths))
