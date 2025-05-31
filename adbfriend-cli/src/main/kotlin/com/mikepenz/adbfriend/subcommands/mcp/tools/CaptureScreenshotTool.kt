@@ -21,8 +21,7 @@ import java.io.File
 fun createCaptureScreenshotTool(adb: AndroidDebugBridgeClient, hostAllowedPaths: List<String>? = null): RegisteredTool = createTool(
     name = "capture-screenshot",
     description = """
-        Captures a screenshot from the Android device and saves it to the host system.
-        The screenshot is first saved on the device at and then pulled to the host system, tot he provided path.
+        Captures a screenshot from the Android device, saves it temporarily, and then transfers it to the specified output path on the host system.
         Use with caution as this can overwrite existing files on the host system.
     """.trimIndent(),
     inputSchema = CAPTURE_SCREENSHOT_TOOL_INPUT
