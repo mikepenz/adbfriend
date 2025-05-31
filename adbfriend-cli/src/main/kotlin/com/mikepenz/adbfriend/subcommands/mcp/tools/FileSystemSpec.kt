@@ -23,3 +23,14 @@ internal fun getDefaultHostAllowedPaths(): List<String> {
     val userHome = System.getProperty("user.home")
     return listOf("$userHome/adbfriend")
 }
+
+
+/**
+ * Checks if a host path is allowed based on the provided allowed paths list.
+ * A path is allowed if it starts with any of the allowed paths.
+ */
+internal fun verifyHostPathAllowed(path: String, allowedHostPaths: List<String>) {
+    if (!allowedHostPaths.any { allowedPath -> path.startsWith(allowedPath) || "$path/".startsWith(allowedPath) }) {
+        throw ToolException("Access to path '$path' on host system is not allowed for security reasons. Allowed paths: ${allowedHostPaths.joinToString()}")
+    }
+}

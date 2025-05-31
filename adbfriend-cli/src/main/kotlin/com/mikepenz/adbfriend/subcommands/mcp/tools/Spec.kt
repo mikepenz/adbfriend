@@ -119,6 +119,16 @@ internal val FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT = Tool.Input(
     required = listOf("serial", "paths")
 )
 
+// Input schema for copying a file from device to host
+internal val FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT = Tool.Input(
+    properties = buildJsonObject {
+        put("serial", SERIAL_INPUT)
+        put("path", PATH_INPUT)
+        put("output-path", OUTPUT_PATH_INPUT)
+    },
+    required = listOf("serial", "path", "output-path")
+)
+
 internal val CAPTURE_SCREENSHOT_TOOL_INPUT = Tool.Input(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)

@@ -23,6 +23,7 @@ fun createCaptureScreenshotTool(adb: AndroidDebugBridgeClient, hostAllowedPaths:
     description = """
         Captures a screenshot from the Android device and saves it to the host system.
         The screenshot is first saved on the device at and then pulled to the host system, tot he provided path.
+        Use with caution as this can overwrite existing files on the host system.
     """.trimIndent(),
     inputSchema = CAPTURE_SCREENSHOT_TOOL_INPUT
 ) {
@@ -30,24 +31,7 @@ fun createCaptureScreenshotTool(adb: AndroidDebugBridgeClient, hostAllowedPaths:
     val outputPath = inputOutputPath
 
     // Use provided host allowed paths or default if not provided
-    val effectiveHostAllowedPaths = hostAllowedPaths ?: getDefaultHostAllowedPaths()
-
-    // Create directories for host allowed paths if they don't exist
-    effectiveHostAllowedPaths.forEach { path ->
-        val directory = File(path)
-        if (!directory.exists()) {
-            directory.mkdirs()
-        }
-    }
-
-    // Verify output path is allowed if provided
-    val isAllowed = effectiveHostAllowedPaths.any { allowedPath ->
-        outputPath.startsWith(allowedPath)
-    }
-
-    if (!isAllowed) {
-        throw ToolException("Output path is not within allowed host paths: $effectiveHostAllowedPaths")
-    }
+    verifyHostPathAllowed(outputPath, hostAllowedPaths ?: getDefaultHostAllowedPaths())
 
     // Ensure the directory exists
     val directory = File(outputPath).parentFile
