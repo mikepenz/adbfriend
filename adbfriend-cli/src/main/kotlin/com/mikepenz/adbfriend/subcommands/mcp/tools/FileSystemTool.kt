@@ -5,6 +5,7 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.Feature
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.malinskiy.adam.request.sync.v2.PullFileRequest
 import com.malinskiy.adam.request.sync.v2.PushFileRequest
 import com.mikepenz.adbfriend.extensions.escapeForSync
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
+import java.io.File
 import java.nio.file.Files
 
 /**
@@ -83,8 +85,9 @@ private fun createReadFileTool(
 ): RegisteredTool = createTool(
     name = "read-file",
     description = """
-        Reads the contents of a file on the Android device.
+        Reads the contents of a (text) file on the Android device.
         Returns the file content as text.
+        This API will not work for binary files.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_TOOL_INPUT
 ) {
@@ -516,15 +519,84 @@ private fun createSearchFilesTool(
 }
 
 /**
+ * Creates a tool for copying a binary file from an Android device to the host system.
+ */
+private fun createCopyFileToHostTool(
+    adb: AndroidDebugBridgeClient,
+    allowedPaths: List<String>,
+    hostAllowedPaths: List<String>? = null
+): RegisteredTool = createTool(
+    name = "copy-file-to-host",
+    description = """
+        Copies a binary file from the Android device to the host system.
+        Specify the file path on the Android device and the output path on the host system.
+        This tool works with both text and binary files.
+        Use with caution as this can overwrite existing files on the host system.
+    """.trimIndent(),
+    inputSchema = FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT
+) {
+    val serial = inputSerial
+    val path = inputPath
+    val outputPath = inputOutputPath
+
+    // Verify device path is allowed
+    verifyPathAllowed(path, allowedPaths)
+    // Use provided host allowed paths or default if not provided
+    verifyHostPathAllowed(outputPath, hostAllowedPaths ?: getDefaultHostAllowedPaths())
+
+    // Ensure the output directory exists
+    val directory = File(outputPath).parentFile
+    if (directory != null && !directory.exists()) {
+        directory.mkdirs()
+    }
+
+    // Pull the file from the device to the host
+    val outputFile = File(outputPath)
+    try {
+        withContext(Dispatchers.IO) {
+            val pullChannel = adb.execute(
+                request = PullFileRequest(
+                    remotePath = path.escapeForSync(),
+                    local = outputFile,
+                    supportedFeatures = listOf(Feature.LS_V2, Feature.STAT_V2, Feature.SENDRECV_V2)
+                ),
+                scope = CoroutineScope(Dispatchers.IO),
+                serial = serial
+            )
+
+            @Suppress("ControlFlowWithEmptyBody")
+            for (percentageDouble in pullChannel) {
+                // wait until the file is fully pulled
+            }
+        }
+
+        // Return the result
+        CallToolResult(
+            content = listOf(TextContent(buildJsonObject {
+                put("success", JsonPrimitive(true))
+                put("source_path", JsonPrimitive(path))
+                put("destination_path", JsonPrimitive(outputPath))
+            }.toString()))
+        )
+    } catch (e: Exception) {
+        CallToolResult(
+            content = listOf(TextContent("Failed to copy file from device: ${e.message}"))
+        )
+    }
+}
+
+/**
  * Creates a set of file system tools for working with files on an Android device.
  *
  * @param adb The ADB client to use for communication with the device
  * @param allowedPaths List of paths that are allowed to be accessed (for security)
+ * @param hostAllowedPaths List of paths on the host system that are allowed to be accessed (for security)
  * @return A list of registered tools for file system operations
  */
 fun createFileSystemTools(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String> = DEFAULT_ALLOWED_PATHS
+    allowedPaths: List<String> = DEFAULT_ALLOWED_PATHS,
+    hostAllowedPaths: List<String>? = null
 ): List<RegisteredTool> = buildList {
     add(createListAllowedDirectoriesTool(allowedPaths))
     add(createListFilesTool(adb, allowedPaths))
@@ -535,4 +607,5 @@ fun createFileSystemTools(
     add(createDeleteTool(adb, allowedPaths))
     add(createMoveFileTool(adb, allowedPaths))
     add(createSearchFilesTool(adb, allowedPaths))
+    add(createCopyFileToHostTool(adb, allowedPaths, hostAllowedPaths))
 }
