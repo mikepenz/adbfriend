@@ -554,7 +554,6 @@ private fun createCopyFileToHostTool(
     val outputFile = File(outputPath)
     try {
         withContext(Dispatchers.IO) {
-            outputFile.parentFile?.mkdirs()
             val pullChannel = adb.execute(
                 request = PullFileRequest(
                     remotePath = path.escapeForSync(),
