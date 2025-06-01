@@ -131,7 +131,13 @@ force stop the 'sample' app
 Do I have a browser installed on the connected emulator?
 ```
 
-![claude-desktop-sample-prompt](.github/readme/claude-desktop-sample-prompt.png)
+```text
+Organize all files in the Download folder of the connected Android device
+```
+
+```text
+ Pull all KotlinConf related files from the Android device to the host
+```
 
 ## Release
 
@@ -156,6 +162,14 @@ The project uses shadow to package the tool in a fat-jar, and also do minimal mi
 ```bash
 ./gradlew adbfriend-cli:exportLibraryDefinitions
 ```
+
+### Example Prompt Screenshots
+
+Claude Desktop
+![claude-desktop-sample-prompt](.github/readme/claude-desktop-sample-prompt.png)
+
+Visual Code
+![visual-code-sample-prompt.png](.github/readme/visual-code-sample-prompt.png)
 
 ### Credits
 
