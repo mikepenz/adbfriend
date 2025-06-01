@@ -7,6 +7,7 @@ shadow = "8.1.1"
 buildconfig = "5.6.5"
 mcp = "0.5.0"
 kotlinx-io = "0.7.0"
+ktor = "3.1.2"
 
 [plugins]
 shadow = { id = "com.github.johnrengelman.shadow", version.ref = "shadow" }
@@ -19,3 +20,4 @@ mordant = { module = "com.github.ajalt.mordant:mordant", version.ref = "mordant"
 slf4j = { module = "org.slf4j:slf4j-nop", version.ref = "slf4j" }
 mcp-kotlin = { module = "io.modelcontextprotocol:kotlin-sdk", version.ref = "mcp" }
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
+ktor-bom = { module = "io.ktor:ktor-bom", version.ref = "ktor" }
