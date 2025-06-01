@@ -25,7 +25,6 @@ internal val OUTPUT_PATH_INPUT = buildJsonObject {
     put("description", JsonPrimitive("The path on the host system where the file should be saved. If not provided, a default path will be used."))
 }
 
-
 internal val DEVICE_FILTER_TOOL_INPUT = Tool.Input(
     properties = JsonObject(
         mapOf(
@@ -71,6 +70,7 @@ internal val FILE_SYSTEM_RECURSIVE_TOOL_INPUT = Tool.Input(
         put("recursive", buildJsonObject {
             put("type", JsonPrimitive("boolean"))
             put("description", JsonPrimitive("Whether to perform the operation recursively"))
+            put("default", JsonPrimitive(false))
         })
     },
     required = listOf("serial", "path")
@@ -88,6 +88,7 @@ internal val FILE_SYSTEM_SEARCH_TOOL_INPUT = Tool.Input(
         put("recursive", buildJsonObject {
             put("type", JsonPrimitive("boolean"))
             put("description", JsonPrimitive("Whether to search recursively in subdirectories"))
+            put("default", JsonPrimitive(false))
         })
     },
     required = listOf("serial", "pattern")
