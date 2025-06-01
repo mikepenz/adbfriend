@@ -24,6 +24,7 @@ kotlin {
             }
             implementation(libs.kotlinx.io.core)
             implementation(libs.mcp.kotlin)
+            implementation(platform(libs.ktor.bom))
         }
     }
 }

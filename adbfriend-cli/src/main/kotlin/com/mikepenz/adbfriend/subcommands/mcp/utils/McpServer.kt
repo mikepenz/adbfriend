@@ -18,7 +18,7 @@ suspend fun setupServer(sseOptions: SseOptions?, builtTools: List<RegisteredTool
         if (enableLog) echo("Starting SSE MCP server on port ${sseOptions.port}")
         embeddedServer(CIO, host = "0.0.0.0", port = sseOptions.port) {
             mcp {
-                return@mcp server
+                server
             }
         }.start(wait = true)
     } else {
