@@ -145,13 +145,13 @@ The project uses shadow to package the tool in a fat-jar, and also do minimal mi
 
 ### AboutLibraries
 
-## Generate `aboutlibraries.json` for `adbfriend`
+#### Generate `aboutlibraries.json` for `adbfriend`
 
 ```bash
 ./gradlew adbfriend:exportLibraryDefinitions
 ```
 
-## Generate `aboutlibraries.json` for `adbfriend-cli`
+#### Generate `aboutlibraries.json` for `adbfriend-cli`
 
 ```bash
 ./gradlew adbfriend-cli:exportLibraryDefinitions
