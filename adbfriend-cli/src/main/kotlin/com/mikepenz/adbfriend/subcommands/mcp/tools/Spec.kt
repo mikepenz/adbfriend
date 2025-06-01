@@ -138,10 +138,25 @@ internal val FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT = Tool.Input(
 internal val FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT = Tool.Input(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
-        put("path", PATH_INPUT)
-        put("output-path", OUTPUT_PATH_INPUT)
+        put("operations", buildJsonObject {
+            put("type", JsonPrimitive("array"))
+            put("description", JsonPrimitive("An array of copy operations to perform from the Android device to the host system."))
+            put("items", buildJsonObject {
+                put("type", JsonPrimitive("object"))
+                put("properties", buildJsonObject {
+                    put("android-path", buildJsonObject {
+                        put("type", JsonPrimitive("string"))
+                        put("description", JsonPrimitive("The source file path on the Android device"))
+                    })
+                    put("host-path", buildJsonObject {
+                        put("type", JsonPrimitive("string"))
+                        put("description", JsonPrimitive("The destination file path on the host system"))
+                    })
+                })
+            })
+        })
     },
-    required = listOf("serial", "path", "output-path")
+    required = listOf("serial", "operations")
 )
 
 internal val CAPTURE_SCREENSHOT_TOOL_INPUT = Tool.Input(

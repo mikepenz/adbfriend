@@ -388,7 +388,7 @@ private fun createMoveFilesTool(
                     } catch (e: Exception) {
                         // If we can't extract source/destination, create a generic error entry
                         val sourcePath = operation.jsonObject["source"]?.jsonPrimitive?.contentOrNull ?: "No source path provided for operation"
-                        val destinationPath = operation.jsonObject["destination"]?.jsonPrimitive?.contentOrNull ?: " No destination path provided for operation"
+                        val destinationPath = operation.jsonObject["destination"]?.jsonPrimitive?.contentOrNull ?: "No destination path provided for operation"
                         add(buildJsonObject {
                             put("source", JsonPrimitive(sourcePath))
                             put("destination", JsonPrimitive(destinationPath))
@@ -546,7 +546,7 @@ private fun createSearchFilesTool(
 }
 
 /**
- * Creates a tool for copying a binary file from an Android device to the host system.
+ * Creates a tool for copying one or many files from an Android device to the host system.
  */
 private fun createCopyFileToHostTool(
     adb: AndroidDebugBridgeClient,
@@ -555,59 +555,84 @@ private fun createCopyFileToHostTool(
 ): RegisteredTool = createTool(
     name = "copy-file-to-host",
     description = """
-        Copies a binary file from the Android device to the host system.
-        Specify the file path on the Android device and the output path on the host system.
-        This tool works with both text and binary files.
+        Copies one or many files from the Android device to the host system. Specify the file paths on the Android device and the output paths on the host system.
+        The android-path must be within the allowed android paths as defined by `list-allowed-directories`.
+        The host-path must be within the allowed host paths as defined by `list-allowed-host-directories`. 
+        This tool works with both text and binary files. This tool does not work for directories.
         Use with caution as this can overwrite existing files on the host system.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT
 ) {
     val serial = inputSerial
-    val path = inputPath
-    val outputPath = inputOutputPath
-
-    // Verify device path is allowed
-    verifyPathAllowed(path, allowedPaths)
-    // Use provided host allowed paths or default if not provided
-    verifyHostPathAllowed(outputPath, hostAllowedPaths)
-
-    // Ensure the output directory exists
-    val directory = File(outputPath).parentFile
-    if (directory != null && !directory.exists()) {
-        directory.mkdirs()
-    }
-
-    // Pull the file from the device to the host
-    val outputFile = File(outputPath)
+    val operations = inputOperations
+    if (operations.isEmpty()) throw ToolException("At least one copy operation must be provided.")
     try {
-        withContext(Dispatchers.IO) {
-            val pullChannel = adb.execute(
-                request = PullFileRequest(
-                    remotePath = path.escapeForSync(),
-                    local = outputFile,
-                    supportedFeatures = listOf(Feature.LS_V2, Feature.STAT_V2, Feature.SENDRECV_V2)
-                ),
-                scope = CoroutineScope(Dispatchers.IO),
-                serial = serial
-            )
+        val results = buildJsonObject {
+            put("operations", buildJsonArray {
+                operations.forEach { operation ->
+                    try {
+                        val androidPath = operation.jsonObject["android-path"]?.jsonPrimitive?.content
+                            ?: throw ToolException("Each operation must have a 'android-path' parameter.")
+                        val hostPath = operation.jsonObject["host-path"]?.jsonPrimitive?.content
+                            ?: throw ToolException("Each operation must have an 'host-path' parameter.")
 
-            @Suppress("ControlFlowWithEmptyBody")
-            for (percentageDouble in pullChannel) {
-                // wait until the file is fully pulled
-            }
+                        // Verify device path is allowed
+                        verifyPathAllowed(androidPath, allowedPaths)
+                        // Use provided host allowed paths or default if not provided
+                        verifyHostPathAllowed(hostPath, hostAllowedPaths)
+
+                        // Ensure the output directory exists
+                        val directory = File(hostPath).parentFile
+                        if (directory != null && !directory.exists()) {
+                            directory.mkdirs()
+                        }
+
+                        // Pull the file from the device to the host
+                        val outputFile = File(hostPath)
+                        withContext(Dispatchers.IO) {
+                            val pullChannel = adb.execute(
+                                request = PullFileRequest(
+                                    remotePath = androidPath.escapeForSync(),
+                                    local = outputFile,
+                                    supportedFeatures = listOf(Feature.LS_V2, Feature.STAT_V2, Feature.SENDRECV_V2)
+                                ),
+                                scope = CoroutineScope(Dispatchers.IO),
+                                serial = serial
+                            )
+
+                            @Suppress("ControlFlowWithEmptyBody")
+                            for (percentageDouble in pullChannel) {
+                                // wait until the file is fully pulled
+                            }
+                        }
+
+                        add(buildJsonObject {
+                            put("android-path", JsonPrimitive(androidPath))
+                            put("host-path", JsonPrimitive(hostPath))
+                            put("success", JsonPrimitive(true))
+                        })
+                    } catch (e: Exception) {
+                        // If we can't extract path/output-path, create a generic error entry
+                        val path = operation.jsonObject["android-path"]?.jsonPrimitive?.contentOrNull ?: "No `android-path` provided for operation"
+                        val outputPath = operation.jsonObject["host-path"]?.jsonPrimitive?.contentOrNull ?: "No output `host-path` provided for operation"
+
+                        add(buildJsonObject {
+                            put("android-path", JsonPrimitive(path))
+                            put("host-path", JsonPrimitive(outputPath))
+                            put("error", JsonPrimitive(e.message ?: "Unknown error"))
+                            put("success", JsonPrimitive(false))
+                        })
+                    }
+                }
+            })
         }
 
-        // Return the result
         CallToolResult(
-            content = listOf(TextContent(buildJsonObject {
-                put("success", JsonPrimitive(true))
-                put("source_path", JsonPrimitive(path))
-                put("destination_path", JsonPrimitive(outputPath))
-            }.toString()))
+            content = listOf(TextContent(results.toString()))
         )
     } catch (e: Exception) {
         CallToolResult(
-            content = listOf(TextContent("Failed to copy file from device: ${e.message}"))
+            content = listOf(TextContent("Failed to process copy operations: ${e.message}"))
         )
     }
 }
