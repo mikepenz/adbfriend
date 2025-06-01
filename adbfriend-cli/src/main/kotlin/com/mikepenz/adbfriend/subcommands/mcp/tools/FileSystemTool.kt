@@ -341,14 +341,15 @@ private fun createListAllowedHostDirectoriesTool(
 /**
  * Creates a tool for moving files on an Android device.
  */
-private fun createMoveFileTool(
+private fun createMoveFilesTool(
     adb: AndroidDebugBridgeClient,
     allowedPaths: List<String>
 ): RegisteredTool = createTool(
-    name = "move-file",
+    name = "move-files",
     description = """
-        Moves a file from the source path to the destination path on the Android device.
-        Both source and destination paths must be within the allowed paths.
+        Moves one or many files from the individual source path to the destination path on the Android device.
+        This can also be used to rename files.
+        Both source and destination paths for each provided item must be within the allowed paths.
         Use caution as this can overwrite important files on the device.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_MOVE_TOOL_INPUT
@@ -625,7 +626,7 @@ fun createFileSystemTools(
     add(createWriteFileTool(adb, allowedPaths))
     add(createCreateDirectoryTool(adb, allowedPaths))
     add(createDeleteTool(adb, allowedPaths))
-    add(createMoveFileTool(adb, allowedPaths))
+    add(createMoveFilesTool(adb, allowedPaths))
     add(createSearchFilesTool(adb, allowedPaths))
     add(createCopyFileToHostTool(adb, allowedPaths, hostAllowedPaths))
 }

@@ -97,16 +97,25 @@ internal val FILE_SYSTEM_SEARCH_TOOL_INPUT = Tool.Input(
 internal val FILE_SYSTEM_MOVE_TOOL_INPUT = Tool.Input(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
-        put("source", buildJsonObject {
-            put("type", JsonPrimitive("string"))
-            put("description", JsonPrimitive("The source file path on the Android device"))
-        })
-        put("destination", buildJsonObject {
-            put("type", JsonPrimitive("string"))
-            put("description", JsonPrimitive("The destination file path on the Android device"))
+        put("operations", buildJsonObject {
+            put("type", JsonPrimitive("array"))
+            put("description", JsonPrimitive("An array of move operations to perform on the Android device"))
+            put("items", buildJsonObject {
+                put("type", JsonPrimitive("object"))
+                put("properties", buildJsonObject {
+                    put("source", buildJsonObject {
+                        put("type", JsonPrimitive("string"))
+                        put("description", JsonPrimitive("The source file path on the Android device"))
+                    })
+                    put("destination", buildJsonObject {
+                        put("type", JsonPrimitive("string"))
+                        put("description", JsonPrimitive("The destination file path on the Android device"))
+                    })
+                })
+            })
         })
     },
-    required = listOf("serial", "source", "destination")
+    required = listOf("serial", "operations")
 )
 
 // Input schema for reading multiple files
