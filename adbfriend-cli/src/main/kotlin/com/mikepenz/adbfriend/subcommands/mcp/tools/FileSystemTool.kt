@@ -39,7 +39,7 @@ private fun createListFilesTool(
 ) {
     val serial = inputSerial
     val path = inputPath
-    val recursive = arguments["recursive"]?.jsonPrimitive?.booleanOrNull ?: false
+    val recursive = inputRecursive
     verifyPathAllowed(path, allowedPaths)
 
     try {
@@ -243,13 +243,13 @@ private fun createDeleteTool(
     description = """
         Deletes a file or directory on the Android device.
         Use the 'recursive' parameter to delete directories recursively.
-        Use with caution as this can delete important files on the device.
+        Use with extreme caution as this can delete important files on the device.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_RECURSIVE_TOOL_INPUT
 ) {
     val serial = inputSerial
     val path = inputPath
-    val recursive = arguments["recursive"]?.jsonPrimitive?.booleanOrNull ?: false
+    val recursive = inputRecursive
 
     verifyPathAllowed(path, allowedPaths)
 
@@ -341,53 +341,71 @@ private fun createListAllowedHostDirectoriesTool(
 /**
  * Creates a tool for moving files on an Android device.
  */
-private fun createMoveFileTool(
+private fun createMoveFilesTool(
     adb: AndroidDebugBridgeClient,
     allowedPaths: List<String>
 ): RegisteredTool = createTool(
-    name = "move-file",
+    name = "move-files",
     description = """
-        Moves a file from the source path to the destination path on the Android device.
-        Both source and destination paths must be within the allowed paths.
+        Moves one or many files from the individual source path to the destination path on the Android device.
+        This can also be used to rename files.
+        Both source and destination paths for each provided item must be within the allowed paths.
         Use caution as this can overwrite important files on the device.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_MOVE_TOOL_INPUT
 ) {
     val serial = inputSerial
-    val sourcePath = arguments["source"]?.jsonPrimitive?.content
-        ?: throw ToolException("The 'source' parameter is required.")
-    val destinationPath = arguments["destination"]?.jsonPrimitive?.content
-        ?: throw ToolException("The 'destination' parameter is required.")
-
-    // Verify both paths are allowed
-    verifyPathAllowed(sourcePath, allowedPaths)
-    verifyPathAllowed(destinationPath, allowedPaths)
+    val operations = inputOperations
+    if (operations.isEmpty()) throw ToolException("At least one move operation must be provided.")
 
     try {
-        // Use mv command to move the file
-        val response = adb.execute(
-            request = ShellCommandRequest("mv \"${sourcePath.escapeForSync()}\" \"${destinationPath.escapeForSync()}\""),
-            serial = serial
-        )
+        val results = buildJsonObject {
+            put("operations", buildJsonArray {
+                operations.forEach { operation ->
+                    try {
+                        val sourcePath = operation.jsonObject["source"]?.jsonPrimitive?.content
+                            ?: throw ToolException("Each operation must have a 'source' parameter.")
+                        val destinationPath = operation.jsonObject["destination"]?.jsonPrimitive?.content
+                            ?: throw ToolException("Each operation must have a 'destination' parameter.")
 
-        if (response.errorOutput.isNotBlank()) {
-            CallToolResult(
-                content = listOf(TextContent("Failed to move file: ${response.errorOutput}"))
-            )
-        } else {
-            val result = buildJsonObject {
-                put("source", JsonPrimitive(sourcePath))
-                put("destination", JsonPrimitive(destinationPath))
-                put("success", JsonPrimitive(true))
-            }
+                        // Verify both paths are allowed
+                        verifyPathAllowed(sourcePath, allowedPaths)
+                        verifyPathAllowed(destinationPath, allowedPaths)
 
-            CallToolResult(
-                content = listOf(TextContent(result.toString()))
-            )
+                        // Use mv command to move the file
+                        val response = adb.execute(
+                            request = ShellCommandRequest("mv \"${sourcePath.escapeForSync()}\" \"${destinationPath.escapeForSync()}\""),
+                            serial = serial
+                        )
+
+                        val error = response.errorOutput.isNotBlank()
+                        add(buildJsonObject {
+                            put("source", JsonPrimitive(sourcePath))
+                            put("destination", JsonPrimitive(destinationPath))
+                            if (error) put("error", JsonPrimitive(response.errorOutput))
+                            put("success", JsonPrimitive(!error))
+                        })
+                    } catch (e: Exception) {
+                        // If we can't extract source/destination, create a generic error entry
+                        val sourcePath = operation.jsonObject["source"]?.jsonPrimitive?.contentOrNull ?: "No source path provided for operation"
+                        val destinationPath = operation.jsonObject["destination"]?.jsonPrimitive?.contentOrNull ?: " No destination path provided for operation"
+                        add(buildJsonObject {
+                            put("source", JsonPrimitive(sourcePath))
+                            put("destination", JsonPrimitive(destinationPath))
+                            put("error", JsonPrimitive(e.message ?: "Unknown error"))
+                            put("success", JsonPrimitive(false))
+                        })
+                    }
+                }
+            })
         }
+
+        CallToolResult(
+            content = listOf(TextContent(results.toString()))
+        )
     } catch (e: Exception) {
         CallToolResult(
-            content = listOf(TextContent("Failed to move file: ${e.message}"))
+            content = listOf(TextContent("Failed to process move operations: ${e.message}"))
         )
     }
 }
@@ -408,12 +426,9 @@ private fun createReadMultipleFilesTool(
     inputSchema = FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT
 ) {
     val serial = inputSerial
-    val paths = arguments["paths"]?.jsonArray?.mapNotNull { it.jsonPrimitive.contentOrNull }
-        ?: throw ToolException("The 'paths' parameter is required and must be an array of strings.")
+    val paths = inputPaths
 
-    if (paths.isEmpty()) {
-        throw ToolException("At least one file path must be provided.")
-    }
+    if (paths.isEmpty()) throw ToolException("At least one file path must be provided.")
 
     // Verify all paths are allowed
     paths.forEach { path ->
@@ -431,19 +446,12 @@ private fun createReadMultipleFilesTool(
                             serial = serial
                         )
 
-                        if (response.errorOutput.isNotBlank()) {
-                            add(buildJsonObject {
-                                put("path", JsonPrimitive(path))
-                                put("error", JsonPrimitive(response.errorOutput))
-                                put("success", JsonPrimitive(false))
-                            })
-                        } else {
-                            add(buildJsonObject {
-                                put("path", JsonPrimitive(path))
-                                put("content", JsonPrimitive(response.output))
-                                put("success", JsonPrimitive(true))
-                            })
-                        }
+                        val error = response.errorOutput.isNotBlank()
+                        add(buildJsonObject {
+                            put("path", JsonPrimitive(path))
+                            put("error", JsonPrimitive(response.errorOutput))
+                            put("success", JsonPrimitive(!error))
+                        })
                     } catch (e: Exception) {
                         add(buildJsonObject {
                             put("path", JsonPrimitive(path))
@@ -483,7 +491,7 @@ private fun createSearchFilesTool(
     val path = arguments["path"]?.jsonPrimitive?.content
     val pattern = arguments["pattern"]?.jsonPrimitive?.content
         ?: throw ToolException("The 'pattern' parameter is required.")
-    val recursive = arguments["recursive"]?.jsonPrimitive?.booleanOrNull ?: false
+    val recursive = inputRecursive
 
     if (!path.isNullOrBlank()) {
         verifyPathAllowed(path, allowedPaths)
@@ -625,7 +633,7 @@ fun createFileSystemTools(
     add(createWriteFileTool(adb, allowedPaths))
     add(createCreateDirectoryTool(adb, allowedPaths))
     add(createDeleteTool(adb, allowedPaths))
-    add(createMoveFileTool(adb, allowedPaths))
+    add(createMoveFilesTool(adb, allowedPaths))
     add(createSearchFilesTool(adb, allowedPaths))
     add(createCopyFileToHostTool(adb, allowedPaths, hostAllowedPaths))
 }
