@@ -45,7 +45,7 @@ private fun configureServer(builtTools: List<RegisteredTool>): Server {
         ),
         ServerOptions(
             capabilities = ServerCapabilities(
-                prompts = ServerCapabilities.Prompts(listChanged = false),
+                tools = ServerCapabilities.Tools(listChanged = false)
             )
         )
     )
