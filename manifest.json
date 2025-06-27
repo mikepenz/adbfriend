@@ -1,0 +1,50 @@
+{
+  "dxt_version": "0.1",
+  "name": "AdbFriend",
+  "version": "1.8.0",
+  "description": "ADB Friend is a tiny cli tool, which helps you to manage your Android device via ADB.",
+  "long_description": "ADB Friend is a tiny cli tool, which helps you to manage your Android device via ADB.\nIts features were mostly designed for developers, but it can be useful for everyone.\n\n## Features\n\n- Sync files from your computer to your phone\n    - Designed for test data, skipping existing files on device\n- Configure device for tests\n    - Disable animations, Enable touches, ...\n- Uninstall apps by pattern\n- Packages command\n    - Apply the immersive flag to all packages matching glob, force-stop, clear app data & cache\n- Extra tools\n    - adb-speed (Helps to identify sub-par cables)",
+  "author": {
+    "name": "Mike Penz",
+    "email": "opensource@mikepenz.dev",
+    "url": "https://github.com/mikepenz/"
+  },
+  "homepage": "https://github.com/mikepenz/adbfriend/",
+  "documentation": "https://github.com/mikepenz/adbfriend/",
+  "server": {
+    "type": "binary",
+    "entry_point": "bin/adbfriend",
+    "mcp_config": {
+      "command": "${__dirname}/bin/adbfriend",
+      "args": [],
+      "env": {
+        "adbfriend-allowed-paths": "${user_config.allowed-paths}",
+        "adbfriend-host-allowed-paths-paths": "${user_config.host-allowed-paths}"
+      }
+    }
+  },
+  "tools_generated": true,
+  "user_config": {
+    "allowed-paths": {
+      "type": "string",
+      "title": "Allowed Paths (on the phone)",
+      "description": "List of allowed paths for file system operations on the Android device",
+      "required": true,
+      "sensitive": false,
+      "default": ["/sdcard/Download/"]
+    },
+    "host-allowed-paths": {
+      "type": "directory",
+      "title": "Host Allowed Paths",
+      "description": "List of allowed paths for file system operations on the host system",
+      "required": true,
+      "sensitive": false,
+      "default": ["${HOME}/adbfriend"]
+    }
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mikepenz/adbfriend/"
+  }
+}

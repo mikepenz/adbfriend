@@ -55,13 +55,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Build *.dxt
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          npx @anthropic-ai/dxt pack adbfriend-cli/build/distributions/adbfriend-cli-shadow-${{ github.ref_name }}
+
       - name: Release
         uses: mikepenz/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           body: ${{steps.github_release.outputs.changelog}}
           prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
-          files: adbfriend-cli/build/distributions/*
+          files: |
+            adbfriend-cli/build/distributions/*
+            adbfriend-cli-shadow-${{ github.ref_name }}.dxt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
