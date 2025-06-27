@@ -1,7 +1,7 @@
 {
   "dxt_version": "0.1",
   "name": "AdbFriend",
-  "version": "1.8.0",
+  "version": "{{VERSION}}",
   "description": "ADB Friend is a tiny cli tool, which helps you to manage your Android device via ADB.",
   "long_description": "ADB Friend is a tiny cli tool, which helps you to manage your Android device via ADB.\nIts features were mostly designed for developers, but it can be useful for everyone.\n\n## Features\n\n- Sync files from your computer to your phone\n    - Designed for test data, skipping existing files on device\n- Configure device for tests\n    - Disable animations, Enable touches, ...\n- Uninstall apps by pattern\n- Packages command\n    - Apply the immersive flag to all packages matching glob, force-stop, clear app data & cache\n- Extra tools\n    - adb-speed (Helps to identify sub-par cables)",
   "author": {
@@ -16,10 +16,11 @@
     "entry_point": "bin/adbfriend",
     "mcp_config": {
       "command": "${__dirname}/bin/adbfriend",
-      "args": [],
+      "args": [ "mcp", "server" ],
       "env": {
         "adbfriend-allowed-paths": "${user_config.allowed-paths}",
-        "adbfriend-host-allowed-paths-paths": "${user_config.host-allowed-paths}"
+        "adbfriend-host-allowed-paths-paths": "${user_config.host-allowed-paths}",
+        "ANDROID_HOME": "${user_config.android-home}"
       }
     }
   },
@@ -40,6 +41,13 @@
       "required": true,
       "sensitive": false,
       "default": ["${HOME}/adbfriend"]
+    },
+    "android-home": {
+      "type": "directory",
+      "title": "Android Home",
+      "description": "Home directory for the Android SDK",
+      "required": true,
+      "sensitive": false
     }
   },
   "license": "Apache-2.0",
