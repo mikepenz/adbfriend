@@ -18,15 +18,15 @@
       "command": "${__dirname}/bin/adbfriend",
       "args": [ "mcp", "server" ],
       "env": {
-        "adbfriend-allowed-paths": "${user_config.allowed-paths}",
-        "adbfriend-host-allowed-paths-paths": "${user_config.host-allowed-paths}",
-        "ANDROID_HOME": "${user_config.android-home}"
+        "adbfriend-allowed-paths": "${user_config.allowed_paths}",
+        "adbfriend-host-allowed-paths-paths": "${user_config.host_allowed_paths}",
+        "ANDROID_HOME": "${user_config.android_home}"
       }
     }
   },
   "tools_generated": true,
   "user_config": {
-    "allowed-paths": {
+    "allowed_paths": {
       "type": "string",
       "title": "Allowed Paths (on the phone)",
       "description": "List of allowed paths for file system operations on the Android device",
@@ -34,7 +34,7 @@
       "sensitive": false,
       "default": ["/sdcard/Download/"]
     },
-    "host-allowed-paths": {
+    "host_allowed_paths": {
       "type": "directory",
       "title": "Host Allowed Paths",
       "description": "List of allowed paths for file system operations on the host system",
@@ -42,7 +42,7 @@
       "sensitive": false,
       "default": ["${HOME}/adbfriend"]
     },
-    "android-home": {
+    "android_home": {
       "type": "directory",
       "title": "Android Home",
       "description": "Home directory for the Android SDK",
