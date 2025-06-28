@@ -30,6 +30,7 @@
       "type": "string",
       "title": "Allowed Paths (on the phone)",
       "description": "List of allowed paths for file system operations on the Android device",
+      "multiple": true,
       "required": true,
       "sensitive": false,
       "default": ["/sdcard/Download/"]
@@ -38,6 +39,7 @@
       "type": "directory",
       "title": "Host Allowed Paths",
       "description": "List of allowed paths for file system operations on the host system",
+      "multiple": true,
       "required": true,
       "sensitive": false,
       "default": ["${HOME}/adbfriend"]
