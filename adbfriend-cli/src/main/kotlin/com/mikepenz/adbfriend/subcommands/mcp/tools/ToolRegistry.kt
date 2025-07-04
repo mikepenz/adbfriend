@@ -14,6 +14,7 @@ fun buildTools(
     add(createConnectedDevicesTool(adb, devices))
     add(createGetInstalledPackagesTool(adb))
     add(createTestConfigurationTool(adb))
+    add(createProxyTool(adb))
     addAll(createFileSystemTools(adb, allowedPaths, hostAllowedPaths))
     add(createCaptureScreenshotTool(adb, hostAllowedPaths))
     add(createInstallApkTool(adb, hostAllowedPaths))
