@@ -44,7 +44,8 @@ adbfriend --help
 ## MCP Server
 
 ADB Friend (Since version 1.4.0) also provides
-a [Model Context Protocol (MCP) Server](https://modelcontextprotocol.io/introduction), that can be configured in popular
+a [Model Context Protocol (MCP) Server](https://modelcontextprotocol.io/introduction), that can be
+configured in popular
 AI Tools
 like [Claude Desktop](https://modelcontextprotocol.io/quickstart/user), [GitHub Copilot](https://docs.github.com/en/copilot/customizing-copilot/extending-copilot-chat-with-mcp), [RayCast](https://manual.raycast.com/model-context-protocol), ...
 
@@ -93,27 +94,27 @@ adbfriend mcp server --sse true
 
 ### Supported tools
 
-| Tool Name                      | Description                                                                                               |
-|--------------------------------|-----------------------------------------------------------------------------------------------------------|
-| check-adb-speed                | Checks the USB connection speed of an Android device for the provided serial.                             |
-| clear-installed-package        | Clears the package data for provided package names on an Android device.                                  |
-| set-immersive-full-for-package | Sets the 'immersive-full' flag for provided package names on an Android device.                           |
-| force-stop-process             | Forces the stop of provided package names on an Android device.                                           |
-| uninstall-package              | Uninstalls provided package names on an Android device.                                                   |
-| get-connected-devices          | Retrieves information about all connected Android devices including serial, model, and state.             |
+| Tool Name                      | Description                                                                                                            |
+|--------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| check-adb-speed                | Checks the USB connection speed of an Android device for the provided serial.                                          |
+| clear-installed-package        | Clears the package data for provided package names on an Android device.                                               |
+| set-immersive-full-for-package | Sets the 'immersive-full' flag for provided package names on an Android device.                                        |
+| force-stop-process             | Forces the stop of provided package names on an Android device.                                                        |
+| uninstall-package              | Uninstalls provided package names on an Android device.                                                                |
+| get-connected-devices          | Retrieves information about all connected Android devices including serial, model, and state.                          |
 | get-installed-packages         | Retrieves information about all installed packages on an Android device. Supports filtering for third-party apps only. |
-| list_allowed_directories       | Lists directories that are allowed to be accessed by the file system tools.                               |
-| list-files                     | Lists files and directories on an Android device. Supports recursive listing with the 'recursive' option. |
-| read-file                      | Reads the content of a file on an Android device.                                                         |
-| read_multiple_files            | Reads the contents of multiple files on an Android device at once (reduces LLM calls).                    |
-| write-file                     | Writes content to a file on an Android device.                                                            |
-| create-directory               | Creates a directory on an Android device.                                                                 |
-| delete                         | Deletes a file or directory on an Android device.                                                         |
-| search-files                   | Searches for files matching a case-insensitive glob pattern within allowed directories.                   |
-| move_file                      | Moves a file from the source path to the destination path on an Android device.                           |
-| copy-file-to-host              | Copies a binary file from the Android device to the host system.                                          |
-| capture-screenshot             | Captures a screenshot from an Android device and saves it to the host system.                             |
-| install-apk                    | Installs an APK on the Android device from a file on the host system within the allowed host paths.       |
+| list_allowed_directories       | Lists directories that are allowed to be accessed by the file system tools.                                            |
+| list-files                     | Lists files and directories on an Android device. Supports recursive listing with the 'recursive' option.              |
+| read-file                      | Reads the content of a file on an Android device.                                                                      |
+| read_multiple_files            | Reads the contents of multiple files on an Android device at once (reduces LLM calls).                                 |
+| write-file                     | Writes content to a file on an Android device.                                                                         |
+| create-directory               | Creates a directory on an Android device.                                                                              |
+| delete                         | Deletes a file or directory on an Android device.                                                                      |
+| search-files                   | Searches for files matching a case-insensitive glob pattern within allowed directories.                                |
+| move_file                      | Moves a file from the source path to the destination path on an Android device.                                        |
+| copy-file-to-host              | Copies a binary file from the Android device to the host system.                                                       |
+| capture-screenshot             | Captures a screenshot from an Android device and saves it to the host system.                                          |
+| install-apk                    | Installs an APK on the Android device from a file on the host system within the allowed host paths.                    |
 
 With many more tools planned for the future.
 
