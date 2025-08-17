@@ -7,6 +7,8 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
+import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.*
 
 /**
@@ -38,14 +40,56 @@ internal val PROXY_TOOL_INPUT = Tool.Input(
  * Creates a tool for configuring HTTP proxy settings on Android devices.
  * This tool can set or disable the global HTTP proxy configuration.
  */
-fun createProxyTool(adb: AndroidDebugBridgeClient): io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool = createTool(
+fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
     name = "configure-proxy",
     description = """
         Configures HTTP proxy settings on an Android device.
         Can set a proxy server with host and port, or disable the proxy entirely.
         Uses the global http_proxy setting which affects system-wide network connections.
     """.trimIndent(),
-    inputSchema = PROXY_TOOL_INPUT
+    inputSchema = PROXY_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            put("serial", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The device serial number"))
+            })
+            put("success", buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Whether the proxy configuration was successful"))
+            })
+            put("enabled", buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Whether the proxy is enabled"))
+            })
+            put("host", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The proxy server host (if enabled and successful)"))
+            })
+            put("port", buildJsonObject {
+                put("type", JsonPrimitive("integer"))
+                put("description", JsonPrimitive("The proxy server port (if enabled and successful)"))
+            })
+            put("proxy", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The proxy configuration string (if enabled and successful)"))
+            })
+            put("currentValue", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The current proxy configuration value (if verification was successful)"))
+            })
+            put("error", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("An error message (if the operation failed)"))
+            })
+        }
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false
+        )
+    }
 ) {
     val serial = inputSerial
     val enabled = arguments["enabled"]?.jsonPrimitive?.booleanOrNull ?: true

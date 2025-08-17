@@ -7,6 +7,8 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
+import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.*
 
 /**
@@ -53,14 +55,66 @@ internal val TEST_CONFIGURATION_TOOL_INPUT = Tool.Input(
  * This tool can disable animations, set immersive mode, reset autofill service, enable touches,
  * unlock the device, and collapse the statusbar.
  */
-fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool = createTool(
+fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
     name = "configure-test-device",
     description = """
         Configures an Android device for testing by setting various flags and options.
         Can disable animations, set immersive mode, reset autofill service, enable touches,
         unlock the device, and collapse the statusbar.
     """.trimIndent(),
-    inputSchema = TEST_CONFIGURATION_TOOL_INPUT
+    inputSchema = TEST_CONFIGURATION_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            put("serial", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The device serial number"))
+            })
+            put("completeSuccess", buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Whether all operations were successful"))
+            })
+            put("operations", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("List of operations performed on the device"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("operation", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The name of the operation"))
+                        })
+                        put("success", buildJsonObject {
+                            put("type", JsonPrimitive("boolean"))
+                            put("description", JsonPrimitive("Whether the operation was successful"))
+                        })
+                        put("details", buildJsonObject {
+                            put("type", JsonPrimitive("array"))
+                            put("description", JsonPrimitive("Additional details about the operation (for animations)"))
+                        })
+                        put("error", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("An error message if the operation failed"))
+                        })
+                        put("value", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The current value (for immersiveMode)"))
+                        })
+                        put("previousValue", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The previous value (for resetAutofillService)"))
+                        })
+                    })
+                })
+            })
+        }
+    ),
+    annotations = { 
+        // Add additional metadata about the tool
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false
+        )
+    }
 ) {
     val serial = inputSerial
     val animations = arguments["animations"]?.jsonPrimitive?.booleanOrNull ?: true

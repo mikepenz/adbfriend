@@ -1,15 +1,17 @@
 package com.mikepenz.adbfriend.subcommands.mcp.tools
 
+import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
+import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
+import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
+import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import com.mikepenz.adbfriend.utils.usbProtocolParser
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
-import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
-import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
 import java.util.concurrent.TimeUnit
 
 fun createCheckAdbSpeedTool(): RegisteredTool = createTool(
@@ -17,7 +19,17 @@ fun createCheckAdbSpeedTool(): RegisteredTool = createTool(
     description = """
         Checks the usb connection speed of the Android device for the provided serial.
     """.trimIndent(),
-    inputSchema = DEVICE_FILTER_TOOL_INPUT
+    inputSchema = DEVICE_FILTER_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(messageDescription = "A message containing the USB connection speed or an error message. In case of failure, the message will contain the error details.")
+        },
+        required = listOf("success", "message")
+    ),
+    annotations = {
+        // Add additional metadata about the tool
+        this
+    }
 ) {
     val serial = inputSerial
 
@@ -39,24 +51,17 @@ fun createCheckAdbSpeedTool(): RegisteredTool = createTool(
         val usbInformation = usbProtocolParser(proc.inputReader().readText())
 
         val match = usbInformation.firstOrNull { it.serial.equals(serial, true) }
-        val messagePrefix = serial
         if (match != null) {
             val speedMessage = if (match.speed.contains("Mb/s", true)) {
                 "\uD83D\uDE82 ${match.speed}"
             } else {
                 "\uD83D\uDE85\uD83D\uDCA8 ${match.speed}"
             }
-            CallToolResult(
-                content = listOf(TextContent("$messagePrefix connected with $speedMessage"))
-            )
+            "$serial connected with $speedMessage".asStructuredResponse(successful = true)
         } else {
-            CallToolResult(
-                content = listOf(TextContent("Failed to retrieve speed for $messagePrefix"))
-            )
+            "Failed to retrieve speed for $serial".asStructuredResponse()
         }
     } else {
-        CallToolResult(
-            content = listOf(TextContent("This tool is only available on Mac OS X. Wrong system."))
-        )
+        "This tool is only available on Mac OS X. Wrong system.".asStructuredResponse()
     }
 }

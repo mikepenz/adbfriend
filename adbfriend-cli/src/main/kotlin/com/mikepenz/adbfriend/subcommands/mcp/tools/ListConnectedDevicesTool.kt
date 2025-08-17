@@ -35,7 +35,36 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
             )
         ),
         required = listOf()
-    )
+    ),
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            put("devices", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("List of connected Android devices"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("serial", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The device serial number"))
+                        })
+                        put("model", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The device model name"))
+                        })
+                        put("state", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The device state (e.g., ONLINE, OFFLINE)"))
+                        })
+                    })
+                })
+            })
+        }
+    ),
+    annotations = { 
+        // Add additional metadata about the tool
+        this
+    }
 ) {
     val serial = arguments["serial"]?.jsonPrimitive?.content?.trim()
     val name = arguments["name"]?.jsonPrimitive?.content?.trim()
@@ -59,6 +88,7 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
     }
 
     CallToolResult(
-        content = listOf(TextContent(result.toString()))
+        structuredContent = result,
+        content = listOf()
     )
 }

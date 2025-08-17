@@ -13,6 +13,7 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.*
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +36,52 @@ private fun createListFilesTool(
         Returns information about each file/directory including name, size, type, and last modified time.
         Use the 'recursive' parameter to list files in subdirectories recursively.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_RECURSIVE_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_RECURSIVE_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema()
+            put("path", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The path that was listed"))
+            })
+            put("recursive", buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Whether the listing was recursive"))
+            })
+            put("files", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("List of files and directories at the specified path"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("name", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The name of the file or directory"))
+                        })
+                        put("path", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The full path of the file or directory"))
+                        })
+                        put("size", buildJsonObject {
+                            put("type", JsonPrimitive("integer"))
+                            put("description", JsonPrimitive("The size of the file in bytes"))
+                        })
+                        put("isDirectory", buildJsonObject {
+                            put("type", JsonPrimitive("boolean"))
+                            put("description", JsonPrimitive("Whether the item is a directory"))
+                        })
+                        put("lastModified", buildJsonObject {
+                            put("type", JsonPrimitive("integer"))
+                            put("description", JsonPrimitive("The last modified time as a Unix timestamp"))
+                        })
+                    })
+                })
+            })
+        }
+    ),
+    annotations = { 
+        copy(destructiveHint = true)
+    }
 ) {
     val serial = inputSerial
     val path = inputPath
@@ -67,12 +113,11 @@ private fun createListFilesTool(
         }
 
         CallToolResult(
-            content = listOf(TextContent(result.toString()))
+            structuredContent = result,
+            content = listOf()
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to list files: ${e.message}"))
-        )
+        "Failed to list files: ${e.message}".asStructuredResponse()
     }
 }
 
@@ -113,13 +158,12 @@ private fun createReadFileTool(
             }
 
             CallToolResult(
-                content = listOf(TextContent(result.toString()))
+                structuredContent = result,
+                content = listOf()
             )
         }
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to read file: ${e.message}"))
-        )
+        "Failed to read file: ${e.message}".asStructuredResponse()
     }
 }
 
@@ -180,9 +224,7 @@ private fun createWriteFileTool(
             content = listOf(TextContent(result.toString()))
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to write file: ${e.message}"))
-        )
+        "Failed to write file: ${e.message}".asStructuredResponse()
     }
 }
 
@@ -226,9 +268,7 @@ private fun createCreateDirectoryTool(
             )
         }
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to create directory: ${e.message}"))
-        )
+        "Failed to create directory: ${e.message}".asStructuredResponse()
     }
 }
 
@@ -281,9 +321,7 @@ private fun createDeleteTool(
             )
         }
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to delete: ${e.message}"))
-        )
+        "Failed to delete: ${e.message}".asStructuredResponse()
     }
 }
 
@@ -404,9 +442,7 @@ private fun createMoveFilesTool(
             content = listOf(TextContent(results.toString()))
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to process move operations: ${e.message}"))
-        )
+        "Failed to process move operations: ${e.message}".asStructuredResponse()
     }
 }
 
@@ -467,9 +503,7 @@ private fun createReadMultipleFilesTool(
             content = listOf(TextContent(results.toString()))
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to read multiple files: ${e.message}"))
-        )
+        "Failed to read multiple files: ${e.message}".asStructuredResponse()
     }
 }
 
@@ -539,9 +573,7 @@ private fun createSearchFilesTool(
             content = listOf(TextContent(result.toString()))
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to search files: ${e.message}"))
-        )
+        "Failed to search files: ${e.message}".asStructuredResponse()
     }
 }
 
@@ -631,9 +663,7 @@ private fun createCopyFileToHostTool(
             content = listOf(TextContent(results.toString()))
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to process copy operations: ${e.message}"))
-        )
+        "Failed to process copy operations: ${e.message}".asStructuredResponse()
     }
 }
 

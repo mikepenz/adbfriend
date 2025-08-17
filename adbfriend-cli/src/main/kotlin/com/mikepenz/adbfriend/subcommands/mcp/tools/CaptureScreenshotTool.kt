@@ -4,11 +4,12 @@ import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.framebuffer.RawImageScreenCaptureAdapter
 import com.malinskiy.adam.request.framebuffer.ScreenCaptureRequest
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
+import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputOutputPath
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
+import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -21,7 +22,24 @@ fun createCaptureScreenshotTool(adb: AndroidDebugBridgeClient, hostAllowedPaths:
         Captures a screenshot from the Android device, saves it temporarily, and then transfers it to the specified output path on the host system.
         Use with caution as this can overwrite existing files on the host system.
     """.trimIndent(),
-    inputSchema = CAPTURE_SCREENSHOT_TOOL_INPUT
+    inputSchema = CAPTURE_SCREENSHOT_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the screenshot was captured successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("screenshot_path", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The path where the screenshot was saved on the host system"))
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        // Add additional metadata about the tool
+        this
+    }
 ) {
     val serial = inputSerial
     val outputPath = inputOutputPath
@@ -49,9 +67,10 @@ fun createCaptureScreenshotTool(adb: AndroidDebugBridgeClient, hostAllowedPaths:
 
     // Return the result
     CallToolResult(
-        content = listOf(TextContent(buildJsonObject {
+        structuredContent = buildJsonObject {
             put("success", JsonPrimitive(true))
             put("screenshot_path", JsonPrimitive(outputPath))
-        }.toString()))
+        },
+        content = listOf()
     )
 }

@@ -7,6 +7,7 @@ import com.mikepenz.adbfriend.utils.packageParser
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
@@ -23,7 +24,36 @@ fun createGetInstalledPackagesTool(adb: AndroidDebugBridgeClient): RegisteredToo
         The `packageName` is the common identifier used to access any other package specific tool.
         Use the `third-party-only` flag to filter out system applications and only show third-party applications.
     """.trimIndent(),
-    inputSchema = DEVICE_FILTER_TOOL_INPUT
+    inputSchema = DEVICE_FILTER_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            put("packages", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("List of installed packages on the Android device"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("packageName", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The package name"))
+                        })
+                        put("version", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The package version"))
+                        })
+                        put("dataDir", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The package data directory"))
+                        })
+                    })
+                })
+            })
+        }
+    ),
+    annotations = { 
+        // Add additional metadata about the tool
+        this
+    }
 ) {
     val serial = inputSerial
 

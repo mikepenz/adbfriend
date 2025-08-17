@@ -10,6 +10,8 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.inputApkPath
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
+import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -31,7 +33,27 @@ fun createInstallApkTool(
         The APK file must be located within the allowed host paths.
         Use with caution as this can install potentially harmful applications.
     """.trimIndent(),
-    inputSchema = INSTALL_APK_TOOL_INPUT
+    inputSchema = INSTALL_APK_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            put("success", buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Whether the APK was installed successfully"))
+            })
+            put("apk_path", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The path to the APK file on the host system"))
+            })
+            put("message", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("A message describing the result of the installation"))
+            })
+        }
+    ),
+    annotations = { 
+        // Add additional metadata about the tool
+        this
+    }
 ) {
     val serial = inputSerial
     val apkPath = inputApkPath

@@ -6,6 +6,7 @@ import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import kotlinx.serialization.json.*
@@ -128,7 +129,32 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                 required = listOf(
                     "serial", "package-names"
                 )
-            )
+            ),
+            outputSchema = Tool.Output(
+                properties = buildJsonObject {
+                    put("results", buildJsonObject {
+                        put("type", JsonPrimitive("array"))
+                        put("description", JsonPrimitive("Results of the operation for each package"))
+                        put("items", buildJsonObject {
+                            put("type", JsonPrimitive("object"))
+                            put("properties", buildJsonObject {
+                                put("packageName", buildJsonObject {
+                                    put("type", JsonPrimitive("string"))
+                                    put("description", JsonPrimitive("The package name"))
+                                })
+                                put("successful", buildJsonObject {
+                                    put("type", JsonPrimitive("boolean"))
+                                    put("description", JsonPrimitive("Whether the operation was successful for this package"))
+                                })
+                            })
+                        })
+                    })
+                }
+            ),
+            annotations = { 
+                // Add additional metadata about the tool
+                this
+            }
         ) {
             val serial = arguments["serial"]?.jsonPrimitive?.content?.trim()
             val packageNames = arguments["package-names"]?.jsonArray
