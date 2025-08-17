@@ -153,11 +153,7 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
                 put("error", JsonPrimitive(error))
             }
         }
-
-        CallToolResult(
-            structuredContent = result,
-            content = listOf()
-        )
+        result.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to configure proxy: ${e.message}".asStructuredResponse()
     }

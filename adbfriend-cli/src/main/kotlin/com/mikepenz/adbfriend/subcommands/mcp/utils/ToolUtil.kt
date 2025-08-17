@@ -1,11 +1,8 @@
 package com.mikepenz.adbfriend.subcommands.mcp.utils
 
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
-import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.*
 import io.modelcontextprotocol.kotlin.sdk.Tool.Input
-import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.*
 
@@ -37,11 +34,18 @@ fun createTool(
     }
 }
 
+fun JsonObject.asStructuredResponse(): CallToolResult {
+    return CallToolResult(
+        structuredContent = this,
+        content = listOf(TextContent(this.toString()))
+    )
+}
+
 fun String.asStructuredResponse(successful: Boolean = false): CallToolResult {
-    return CallToolResult(content = listOf(), structuredContent = buildJsonObject {
+    return buildJsonObject {
         put("success", JsonPrimitive(successful))
         put("message", JsonPrimitive(this@asStructuredResponse))
-    })
+    }.asStructuredResponse()
 }
 
 fun JsonObjectBuilder.applyDefaultOutputSchema(

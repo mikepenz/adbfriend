@@ -312,11 +312,7 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
             put("completeSuccess", JsonPrimitive(completeSuccess))
             put("operations", JsonArray(results))
         }
-
-        CallToolResult(
-            structuredContent = result,
-            content = listOf()
-        )
+        result.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to configure device for testing: ${e.message}".asStructuredResponse()
     }

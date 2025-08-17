@@ -4,6 +4,7 @@ import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.device.Device
 import com.mikepenz.adbfriend.extensions.fetchModel
 import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
+import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
 import io.modelcontextprotocol.kotlin.sdk.Tool
@@ -95,9 +96,5 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
             }
         })
     }
-
-    CallToolResult(
-        structuredContent = result,
-        content = listOf()
-    )
+    result.asStructuredResponse()
 }

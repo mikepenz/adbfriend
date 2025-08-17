@@ -3,6 +3,7 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
 import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
+import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import com.mikepenz.adbfriend.utils.convertGlobToRegex
@@ -106,9 +107,5 @@ fun createGetInstalledPackagesTool(adb: AndroidDebugBridgeClient): RegisteredToo
             }
         })
     }
-
-    CallToolResult(
-        structuredContent = result,
-        content = listOf()
-    )
+    result.asStructuredResponse()
 }

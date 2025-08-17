@@ -4,11 +4,7 @@ import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.framebuffer.RawImageScreenCaptureAdapter
 import com.malinskiy.adam.request.framebuffer.ScreenCaptureRequest
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
-import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
-import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
-import com.mikepenz.adbfriend.subcommands.mcp.utils.inputOutputPath
-import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
+import com.mikepenz.adbfriend.subcommands.mcp.utils.*
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.JsonPrimitive
@@ -69,11 +65,8 @@ fun createCaptureScreenshotTool(adb: AndroidDebugBridgeClient, hostAllowedPaths:
     }
 
     // Return the result
-    CallToolResult(
-        structuredContent = buildJsonObject {
-            put("success", JsonPrimitive(true))
-            put("screenshot_path", JsonPrimitive(outputPath))
-        },
-        content = listOf()
-    )
+    buildJsonObject {
+        put("success", JsonPrimitive(true))
+        put("screenshot_path", JsonPrimitive(outputPath))
+    }.asStructuredResponse()
 }
