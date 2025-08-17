@@ -31,7 +31,6 @@ kotlin {
 
 application {
     applicationName = "adbfriend"
-    mainModule = "com.mikepenz.adbfriend.app"
     mainClass = "com.mikepenz.adbfriend.MainKt"
     version = property("VERSION_NAME").toString()
 }

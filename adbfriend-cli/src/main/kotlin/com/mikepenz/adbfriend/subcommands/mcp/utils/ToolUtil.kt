@@ -3,9 +3,9 @@ package com.mikepenz.adbfriend.subcommands.mcp.utils
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
 import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.Tool.Input
+import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.*
 
@@ -16,21 +16,46 @@ fun createTool(
     description: String?,
     /** A JSON object defining the expected parameters for the tool. */
     inputSchema: Input,
-    handler: suspend CallToolRequest.() -> CallToolResult
+    outputSchema: Tool.Output = Tool.Output(),
+    annotations: ToolAnnotations.() -> ToolAnnotations = { this },
+    handler: suspend CallToolRequest.() -> CallToolResult,
 ): RegisteredTool = RegisteredTool(
     Tool(
         name = name,
         description = description,
-        inputSchema = inputSchema
+        inputSchema = inputSchema,
+        outputSchema = outputSchema,
+        annotations = annotations(ToolAnnotations(title = name))
     ),
 ) {
     return@RegisteredTool try {
         handler(it)
     } catch (t: ToolException) {
-        CallToolResult(content = listOf(TextContent(t.message)))
+        t.message.asStructuredResponse()
     } catch (t: Throwable) {
-        CallToolResult(content = listOf(TextContent("An unhandled exception occurred while using the tool: ${t.message}")))
+        "An unhandled exception occurred while using the tool: ${t.message}".asStructuredResponse()
     }
+}
+
+fun String.asStructuredResponse(successful: Boolean = false): CallToolResult {
+    return CallToolResult(content = listOf(), structuredContent = buildJsonObject {
+        put("success", JsonPrimitive(successful))
+        put("message", JsonPrimitive(this@asStructuredResponse))
+    })
+}
+
+fun JsonObjectBuilder.applyDefaultOutputSchema(
+    successDescription: String = "Whether the operations was executed successfully",
+    messageDescription: String = "In case of failure, the message will contain the error details.",
+) {
+    put("success", buildJsonObject {
+        put("type", JsonPrimitive("boolean"))
+        put("description", JsonPrimitive(successDescription))
+    })
+    put("message", buildJsonObject {
+        put("type", JsonPrimitive("string"))
+        put("description", JsonPrimitive(messageDescription))
+    })
 }
 
 val CallToolRequest.inputSerial: String

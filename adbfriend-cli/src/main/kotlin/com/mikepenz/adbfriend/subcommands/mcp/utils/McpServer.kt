@@ -45,7 +45,8 @@ private fun configureServer(builtTools: List<RegisteredTool>): Server {
         ),
         ServerOptions(
             capabilities = ServerCapabilities(
-                tools = ServerCapabilities.Tools(listChanged = false)
+                tools = ServerCapabilities.Tools(listChanged = false),
+                logging = null
             )
         )
     )

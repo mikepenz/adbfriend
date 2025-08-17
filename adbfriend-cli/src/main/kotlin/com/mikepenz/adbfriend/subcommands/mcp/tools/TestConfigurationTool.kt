@@ -2,11 +2,13 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
+import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.*
 
 /**
@@ -53,14 +55,71 @@ internal val TEST_CONFIGURATION_TOOL_INPUT = Tool.Input(
  * This tool can disable animations, set immersive mode, reset autofill service, enable touches,
  * unlock the device, and collapse the statusbar.
  */
-fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool = createTool(
+fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
     name = "configure-test-device",
     description = """
         Configures an Android device for testing by setting various flags and options.
         Can disable animations, set immersive mode, reset autofill service, enable touches,
         unlock the device, and collapse the statusbar.
     """.trimIndent(),
-    inputSchema = TEST_CONFIGURATION_TOOL_INPUT
+    inputSchema = TEST_CONFIGURATION_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the device configuration operations executed successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("serial", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The device serial number"))
+            })
+            put("completeSuccess", buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Whether all operations were successful"))
+            })
+            put("operations", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("List of operations performed on the device"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("operation", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The name of the operation"))
+                        })
+                        put("success", buildJsonObject {
+                            put("type", JsonPrimitive("boolean"))
+                            put("description", JsonPrimitive("Whether the operation was successful"))
+                        })
+                        put("details", buildJsonObject {
+                            put("type", JsonPrimitive("array"))
+                            put("description", JsonPrimitive("Additional details about the operation (for animations)"))
+                        })
+                        put("error", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("An error message if the operation failed"))
+                        })
+                        put("value", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The current value (for immersiveMode)"))
+                        })
+                        put("previousValue", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The previous value (for resetAutofillService)"))
+                        })
+                    })
+                })
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false,
+            destructiveHint = true,
+        )
+    }
 ) {
     val serial = inputSerial
     val animations = arguments["animations"]?.jsonPrimitive?.booleanOrNull ?: true
@@ -248,18 +307,18 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): io.modelcontextp
 
         // Build the final result
         val result = buildJsonObject {
+            put("success", JsonPrimitive(true))
             put("serial", JsonPrimitive(serial))
             put("completeSuccess", JsonPrimitive(completeSuccess))
             put("operations", JsonArray(results))
         }
 
         CallToolResult(
-            content = listOf(TextContent(result.toString()))
+            structuredContent = result,
+            content = listOf()
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to configure device for testing: ${e.message}"))
-        )
+        "Failed to configure device for testing: ${e.message}".asStructuredResponse()
     }
 }
 

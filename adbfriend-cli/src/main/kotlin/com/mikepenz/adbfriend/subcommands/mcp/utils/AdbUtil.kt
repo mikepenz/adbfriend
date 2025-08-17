@@ -60,7 +60,7 @@ internal suspend fun AndroidDebugBridgeClient.listFiles(
     serial: String,
     path: String,
     allowedPaths: List<String>,
-    recursive: Boolean = false
+    recursive: Boolean = false,
 ): List<Pair<String, com.malinskiy.adam.request.sync.model.FileEntry>> {
     val allFiles = mutableListOf<Pair<String, com.malinskiy.adam.request.sync.model.FileEntry>>()
 
