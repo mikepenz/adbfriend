@@ -185,11 +185,7 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                         }
                     })
                 }
-
-                CallToolResult(
-                    structuredContent = result,
-                    content = listOf()
-                )
+                result.asStructuredResponse()
             }
         }
     )

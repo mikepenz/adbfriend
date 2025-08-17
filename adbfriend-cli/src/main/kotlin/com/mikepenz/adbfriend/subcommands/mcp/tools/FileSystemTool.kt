@@ -114,11 +114,7 @@ private fun createListFilesTool(
                 }
             })
         }
-
-        CallToolResult(
-            structuredContent = result,
-            content = listOf()
-        )
+        result.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to list files: ${e.message}".asStructuredResponse()
     }
@@ -182,11 +178,7 @@ private fun createReadFileTool(
                 put("path", JsonPrimitive(path))
                 put("content", JsonPrimitive(response.output))
             }
-
-            CallToolResult(
-                structuredContent = result,
-                content = listOf()
-            )
+            result.asStructuredResponse()
         }
     } catch (e: Exception) {
         "Failed to read file: ${e.message}".asStructuredResponse()
@@ -265,11 +257,7 @@ private fun createWriteFileTool(
             put("success", JsonPrimitive(true))
             put("path", JsonPrimitive(path))
         }
-
-        CallToolResult(
-            structuredContent = result,
-            content = listOf()
-        )
+        result.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to write file: ${e.message}".asStructuredResponse()
     }
@@ -327,11 +315,7 @@ private fun createCreateDirectoryTool(
                 put("success", JsonPrimitive(true))
                 put("path", JsonPrimitive(path))
             }
-
-            CallToolResult(
-                structuredContent = result,
-                content = listOf()
-            )
+            result.asStructuredResponse()
         }
     } catch (e: Exception) {
         "Failed to create directory: ${e.message}".asStructuredResponse()
@@ -404,11 +388,7 @@ private fun createDeleteTool(
                 put("path", JsonPrimitive(path))
                 put("recursive", JsonPrimitive(recursive))
             }
-
-            CallToolResult(
-                structuredContent = result,
-                content = listOf()
-            )
+            result.asStructuredResponse()
         }
     } catch (e: Exception) {
         "Failed to delete: ${e.message}".asStructuredResponse()
@@ -619,11 +599,7 @@ private fun createMoveFilesTool(
                 }
             })
         }
-
-        CallToolResult(
-            structuredContent = results,
-            content = listOf()
-        )
+        results.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to process move operations: ${e.message}".asStructuredResponse()
     }
@@ -727,11 +703,7 @@ private fun createReadMultipleFilesTool(
                 }
             })
         }
-
-        CallToolResult(
-            structuredContent = results,
-            content = listOf()
-        )
+        results.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to read multiple files: ${e.message}".asStructuredResponse()
     }
@@ -853,11 +825,7 @@ private fun createSearchFilesTool(
                 fileDetails.forEach { add(it) }
             })
         }
-
-        CallToolResult(
-            structuredContent = result,
-            content = listOf()
-        )
+        result.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to search files: ${e.message}".asStructuredResponse()
     }
@@ -987,10 +955,7 @@ private fun createCopyFileToHostTool(
             })
         }
 
-        CallToolResult(
-            structuredContent = results,
-            content = listOf()
-        )
+        results.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to process copy operations: ${e.message}".asStructuredResponse()
     }
