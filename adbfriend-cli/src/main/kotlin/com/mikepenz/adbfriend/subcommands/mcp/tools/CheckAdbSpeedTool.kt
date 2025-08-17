@@ -19,7 +19,7 @@ fun createCheckAdbSpeedTool(): RegisteredTool = createTool(
     description = """
         Checks the usb connection speed of the Android device for the provided serial.
     """.trimIndent(),
-    inputSchema = DEVICE_FILTER_TOOL_INPUT,
+    inputSchema = SERIAL_ONLY_TOOL_INPUT,
     outputSchema = Tool.Output(
         properties = buildJsonObject {
             applyDefaultOutputSchema(messageDescription = "A message containing the USB connection speed or an error message. In case of failure, the message will contain the error details.")
@@ -27,8 +27,11 @@ fun createCheckAdbSpeedTool(): RegisteredTool = createTool(
         required = listOf("success", "message")
     ),
     annotations = {
-        // Add additional metadata about the tool
-        this
+        copy(
+            readOnlyHint = true,
+            openWorldHint = false,
+            destructiveHint = false,
+        )
     }
 ) {
     val serial = inputSerial

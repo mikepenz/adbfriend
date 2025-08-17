@@ -2,13 +2,13 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
+import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
+import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
-import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import kotlinx.serialization.json.*
 
 
@@ -105,7 +105,7 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
     name: String,
     description: String,
     extraProperties: Map<String, JsonObject> = emptyMap(),
-    block: suspend CallToolRequest.(adb: AndroidDebugBridgeClient, serial: String, packageNames: Array<String>) -> Map<String, Boolean>
+    block: suspend CallToolRequest.(adb: AndroidDebugBridgeClient, serial: String, packageNames: Array<String>) -> Map<String, Boolean>,
 ) {
     add(
         createTool(
@@ -125,13 +125,17 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                         })
                         put("description", JsonPrimitive("The array of package names to clear the data for."))
                     })
-                }, 
+                },
                 required = listOf(
                     "serial", "package-names"
                 )
             ),
             outputSchema = Tool.Output(
                 properties = buildJsonObject {
+                    applyDefaultOutputSchema(
+                        successDescription = "Whether the operation was executed successfully",
+                        messageDescription = "An optional status message informing about errors during execution"
+                    )
                     put("results", buildJsonObject {
                         put("type", JsonPrimitive("array"))
                         put("description", JsonPrimitive("Results of the operation for each package"))
@@ -140,7 +144,7 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                             put("properties", buildJsonObject {
                                 put("packageName", buildJsonObject {
                                     put("type", JsonPrimitive("string"))
-                                    put("description", JsonPrimitive("The package name"))
+                                    put("description", JsonPrimitive("The android package name"))
                                 })
                                 put("successful", buildJsonObject {
                                     put("type", JsonPrimitive("boolean"))
@@ -149,28 +153,29 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                             })
                         })
                     })
-                }
+                },
+                required = listOf("success")
             ),
-            annotations = { 
-                // Add additional metadata about the tool
-                this
+            annotations = {
+                copy(
+                    readOnlyHint = false,
+                    openWorldHint = false,
+                    destructiveHint = true,
+                )
             }
         ) {
             val serial = arguments["serial"]?.jsonPrimitive?.content?.trim()
             val packageNames = arguments["package-names"]?.jsonArray
 
             if (serial.isNullOrBlank()) {
-                CallToolResult(
-                    content = listOf(TextContent("The 'serial' parameter is required."))
-                )
+                "The 'serial' parameter is required.".asStructuredResponse()
             } else if (packageNames.isNullOrEmpty()) {
-                CallToolResult(
-                    content = listOf(TextContent("The 'package-names' parameter is required."))
-                )
+                "The 'package-names' parameter is required.".asStructuredResponse()
             } else {
                 val results = block(adb, serial, packageNames.map { it.jsonPrimitive.content }.toTypedArray())
 
                 val result = buildJsonObject {
+                    put("success", JsonPrimitive(true))
                     put("results", buildJsonArray {
                         results.onEach { (packageName, result) ->
                             add(buildJsonObject {
@@ -182,7 +187,8 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                 }
 
                 CallToolResult(
-                    content = listOf(TextContent(result.toString()))
+                    structuredContent = result,
+                    content = listOf()
                 )
             }
         }

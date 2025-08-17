@@ -2,12 +2,12 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
+import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.*
 
@@ -50,13 +50,13 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
     inputSchema = PROXY_TOOL_INPUT,
     outputSchema = Tool.Output(
         properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the proxy configuration was successful",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
             put("serial", buildJsonObject {
                 put("type", JsonPrimitive("string"))
                 put("description", JsonPrimitive("The device serial number"))
-            })
-            put("success", buildJsonObject {
-                put("type", JsonPrimitive("boolean"))
-                put("description", JsonPrimitive("Whether the proxy configuration was successful"))
             })
             put("enabled", buildJsonObject {
                 put("type", JsonPrimitive("boolean"))
@@ -82,12 +82,14 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
                 put("type", JsonPrimitive("string"))
                 put("description", JsonPrimitive("An error message (if the operation failed)"))
             })
-        }
+        },
+        required = listOf("success")
     ),
     annotations = {
         copy(
             readOnlyHint = false,
-            openWorldHint = false
+            openWorldHint = false,
+            destructiveHint = true,
         )
     }
 ) {
@@ -100,14 +102,10 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
         val proxyValue = if (enabled) {
             // Validate required parameters when enabling proxy
             if (host.isNullOrBlank()) {
-                return@createTool CallToolResult(
-                    content = listOf(TextContent("Host parameter is required when enabling proxy"))
-                )
+                return@createTool "Host parameter is required when enabling proxy".asStructuredResponse()
             }
             if (port == null || port < 1 || port > 65535) {
-                return@createTool CallToolResult(
-                    content = listOf(TextContent("Valid port parameter (1-65535) is required when enabling proxy"))
-                )
+                return@createTool "Valid port parameter (1-65535) is required when enabling proxy".asStructuredResponse()
             }
             "$host:$port"
         } else {
@@ -157,11 +155,10 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
         }
 
         CallToolResult(
-            content = listOf(TextContent(result.toString()))
+            structuredContent = result,
+            content = listOf()
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to configure proxy: ${e.message}"))
-        )
+        "Failed to configure proxy: ${e.message}".asStructuredResponse()
     }
 }

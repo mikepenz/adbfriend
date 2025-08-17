@@ -37,8 +37,11 @@ fun createCaptureScreenshotTool(adb: AndroidDebugBridgeClient, hostAllowedPaths:
         required = listOf("success")
     ),
     annotations = {
-        // Add additional metadata about the tool
-        this
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false,
+            destructiveHint = true,
+        )
     }
 ) {
     val serial = inputSerial

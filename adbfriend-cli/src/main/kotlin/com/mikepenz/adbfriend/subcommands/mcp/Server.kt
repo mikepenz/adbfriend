@@ -21,8 +21,12 @@ class SseOptions : OptionGroup() {
 class Server : AdbCommand() {
     val sseOptions by SseOptions().cooccurring()
     val tools by option().flag()
-    val allowedPaths: List<String> by option(help = "List of allowed paths for file system operations on the Android device", envvar = "adbfriend-allowed-paths").varargValues().default(DEFAULT_ALLOWED_PATHS)
-    val hostAllowedPaths: List<String> by option(help = "List of allowed paths for file system operations on the host system", envvar = "adbfriend-host-allowed-paths").varargValues().default(getDefaultHostAllowedPaths())
+    val allowedPaths: List<String> by option(help = "List of allowed paths for file system operations on the Android device", envvar = "adbfriend-allowed-paths").varargValues()
+        .default(DEFAULT_ALLOWED_PATHS)
+    val hostAllowedPaths: List<String> by option(
+        help = "List of allowed paths for file system operations on the host system",
+        envvar = "adbfriend-host-allowed-paths"
+    ).varargValues().default(getDefaultHostAllowedPaths())
 
     override val requireAdbServer = false
     override val failOnNoDevice = false

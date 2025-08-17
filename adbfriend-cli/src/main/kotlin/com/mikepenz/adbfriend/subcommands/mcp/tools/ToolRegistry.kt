@@ -7,7 +7,7 @@ fun buildTools(
     adb: AndroidDebugBridgeClient,
     devices: List<Device>,
     allowedPaths: List<String> = DEFAULT_ALLOWED_PATHS,
-    hostAllowedPaths: List<String> = getDefaultHostAllowedPaths()
+    hostAllowedPaths: List<String> = getDefaultHostAllowedPaths(),
 ) = buildList {
     add(createCheckAdbSpeedTool())
     addAll(createInstalledPackageTools(adb))

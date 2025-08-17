@@ -25,6 +25,15 @@ internal val OUTPUT_PATH_INPUT = buildJsonObject {
     put("description", JsonPrimitive("The path on the host system where the file should be saved. If not provided, a default path will be used."))
 }
 
+internal val SERIAL_ONLY_TOOL_INPUT = Tool.Input(
+    properties = JsonObject(
+        mapOf(
+            "serial" to SERIAL_INPUT
+        )
+    ),
+    required = listOf("serial")
+)
+
 internal val DEVICE_FILTER_TOOL_INPUT = Tool.Input(
     properties = JsonObject(
         mapOf(

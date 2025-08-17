@@ -46,7 +46,7 @@ fun String.asStructuredResponse(successful: Boolean = false): CallToolResult {
 
 fun JsonObjectBuilder.applyDefaultOutputSchema(
     successDescription: String = "Whether the operations was executed successfully",
-    messageDescription: String = "In case of failure, the message will contain the error details."
+    messageDescription: String = "In case of failure, the message will contain the error details.",
 ) {
     put("success", buildJsonObject {
         put("type", JsonPrimitive("boolean"))

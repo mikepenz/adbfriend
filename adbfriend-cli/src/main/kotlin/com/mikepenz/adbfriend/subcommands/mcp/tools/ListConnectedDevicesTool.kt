@@ -3,11 +3,11 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.device.Device
 import com.mikepenz.adbfriend.extensions.fetchModel
+import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
+import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
-import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import kotlinx.serialization.json.*
 
 fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Device>): RegisteredTool = createTool(
@@ -38,6 +38,10 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
     ),
     outputSchema = Tool.Output(
         properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the connected devices were retrieved successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
             put("devices", buildJsonObject {
                 put("type", JsonPrimitive("array"))
                 put("description", JsonPrimitive("List of connected Android devices"))
@@ -59,17 +63,22 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
                     })
                 })
             })
-        }
+        },
+        required = listOf("success")
     ),
-    annotations = { 
-        // Add additional metadata about the tool
-        this
+    annotations = {
+        copy(
+            readOnlyHint = true,
+            openWorldHint = false,
+            destructiveHint = false,
+        )
     }
 ) {
     val serial = arguments["serial"]?.jsonPrimitive?.content?.trim()
     val name = arguments["name"]?.jsonPrimitive?.content?.trim()
 
     val result = buildJsonObject {
+        put("success", JsonPrimitive(true))
         put("devices", buildJsonArray {
             devices.onEach { device ->
                 if (serial.isNullOrBlank() || serial.equals(device.serial, true)) {

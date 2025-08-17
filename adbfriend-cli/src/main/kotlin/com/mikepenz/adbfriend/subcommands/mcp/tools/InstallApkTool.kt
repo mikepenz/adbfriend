@@ -5,13 +5,9 @@ import com.malinskiy.adam.request.Feature
 import com.malinskiy.adam.request.pkg.InstallRemotePackageRequest
 import com.malinskiy.adam.request.sync.v2.PushFileRequest
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
-import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
-import com.mikepenz.adbfriend.subcommands.mcp.utils.inputApkPath
-import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
+import com.mikepenz.adbfriend.subcommands.mcp.utils.*
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +21,7 @@ import java.io.File
  */
 fun createInstallApkTool(
     adb: AndroidDebugBridgeClient,
-    hostAllowedPaths: List<String>? = null
+    hostAllowedPaths: List<String>? = null,
 ): RegisteredTool = createTool(
     name = "install-apk",
     description = """
@@ -36,23 +32,23 @@ fun createInstallApkTool(
     inputSchema = INSTALL_APK_TOOL_INPUT,
     outputSchema = Tool.Output(
         properties = buildJsonObject {
-            put("success", buildJsonObject {
-                put("type", JsonPrimitive("boolean"))
-                put("description", JsonPrimitive("Whether the APK was installed successfully"))
-            })
+            applyDefaultOutputSchema(
+                successDescription = "Whether the APK was installed successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
             put("apk_path", buildJsonObject {
                 put("type", JsonPrimitive("string"))
                 put("description", JsonPrimitive("The path to the APK file on the host system"))
             })
-            put("message", buildJsonObject {
-                put("type", JsonPrimitive("string"))
-                put("description", JsonPrimitive("A message describing the result of the installation"))
-            })
-        }
+        },
+        required = listOf("success")
     ),
-    annotations = { 
-        // Add additional metadata about the tool
-        this
+    annotations = {
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false,
+            destructiveHint = true,
+        )
     }
 ) {
     val serial = inputSerial
@@ -97,25 +93,25 @@ fun createInstallApkTool(
         if (success) {
             // Return success result
             CallToolResult(
-                content = listOf(TextContent(buildJsonObject {
+                structuredContent = buildJsonObject {
                     put("success", JsonPrimitive(true))
                     put("apk_path", JsonPrimitive(apkPath))
                     put("message", JsonPrimitive("APK installed successfully"))
-                }.toString()))
+                },
+                content = listOf()
             )
         } else {
             // Return error result
             CallToolResult(
-                content = listOf(TextContent(buildJsonObject {
+                structuredContent = buildJsonObject {
                     put("success", JsonPrimitive(false))
                     put("apk_path", JsonPrimitive(apkPath))
                     put("message", JsonPrimitive("Failed to install APK: ${installResponse.output.trim()}"))
-                }.toString()))
+                },
+                content = listOf()
             )
         }
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to install APK: ${e.message}"))
-        )
+        "Failed to install APK: ${e.message}".asStructuredResponse()
     }
 }

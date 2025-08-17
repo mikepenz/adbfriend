@@ -2,12 +2,12 @@ package com.mikepenz.adbfriend.subcommands.mcp.tools
 
 import com.malinskiy.adam.AndroidDebugBridgeClient
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
+import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
+import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.serialization.json.*
 
@@ -65,6 +65,10 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
     inputSchema = TEST_CONFIGURATION_TOOL_INPUT,
     outputSchema = Tool.Output(
         properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the device configuration operations executed successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
             put("serial", buildJsonObject {
                 put("type", JsonPrimitive("string"))
                 put("description", JsonPrimitive("The device serial number"))
@@ -106,13 +110,14 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
                     })
                 })
             })
-        }
+        },
+        required = listOf("success")
     ),
-    annotations = { 
-        // Add additional metadata about the tool
+    annotations = {
         copy(
             readOnlyHint = false,
-            openWorldHint = false
+            openWorldHint = false,
+            destructiveHint = true,
         )
     }
 ) {
@@ -302,18 +307,18 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
 
         // Build the final result
         val result = buildJsonObject {
+            put("success", JsonPrimitive(true))
             put("serial", JsonPrimitive(serial))
             put("completeSuccess", JsonPrimitive(completeSuccess))
             put("operations", JsonArray(results))
         }
 
         CallToolResult(
-            content = listOf(TextContent(result.toString()))
+            structuredContent = result,
+            content = listOf()
         )
     } catch (e: Exception) {
-        CallToolResult(
-            content = listOf(TextContent("Failed to configure device for testing: ${e.message}"))
-        )
+        "Failed to configure device for testing: ${e.message}".asStructuredResponse()
     }
 }
 

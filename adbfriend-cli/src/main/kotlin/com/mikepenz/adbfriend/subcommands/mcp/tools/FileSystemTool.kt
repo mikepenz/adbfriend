@@ -11,9 +11,7 @@ import com.mikepenz.adbfriend.extensions.escapeForSync
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
 import com.mikepenz.adbfriend.subcommands.mcp.utils.*
 import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
 import io.modelcontextprotocol.kotlin.sdk.Tool
-import io.modelcontextprotocol.kotlin.sdk.ToolAnnotations
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +26,7 @@ import java.nio.file.Files
  */
 private fun createListFilesTool(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "list-files",
     description = """
@@ -79,8 +77,12 @@ private fun createListFilesTool(
             })
         }
     ),
-    annotations = { 
-        copy(destructiveHint = true)
+    annotations = {
+        copy(
+            readOnlyHint = true,
+            openWorldHint = false,
+            destructiveHint = false,
+        )
     }
 ) {
     val serial = inputSerial
@@ -94,6 +96,7 @@ private fun createListFilesTool(
 
         // Build the result JSON
         val result = buildJsonObject {
+            put("success", JsonPrimitive(true))
             put("path", JsonPrimitive(path))
             put("recursive", JsonPrimitive(recursive))
             put("files", buildJsonArray {
@@ -126,7 +129,7 @@ private fun createListFilesTool(
  */
 private fun createReadFileTool(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "read-file",
     description = """
@@ -134,7 +137,31 @@ private fun createReadFileTool(
         Returns the file content as text.
         This API will not work for binary files.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the file was read successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("path", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The path of the file that was read"))
+            })
+            put("content", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The textual content of the file"))
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = true,
+            openWorldHint = false,
+            destructiveHint = false,
+        )
+    }
 ) {
     val serial = inputSerial
     val path = inputPath
@@ -148,11 +175,10 @@ private fun createReadFileTool(
         )
 
         if (response.errorOutput.isNotBlank()) {
-            CallToolResult(
-                content = listOf(TextContent("Failed to read file: ${response.errorOutput}"))
-            )
+            "Failed to read file: ${response.errorOutput}".asStructuredResponse()
         } else {
             val result = buildJsonObject {
+                put("success", JsonPrimitive(true))
                 put("path", JsonPrimitive(path))
                 put("content", JsonPrimitive(response.output))
             }
@@ -172,7 +198,7 @@ private fun createReadFileTool(
  */
 private fun createWriteFileTool(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "write-file",
     description = """
@@ -180,7 +206,27 @@ private fun createWriteFileTool(
         Creates the file if it doesn't exist, or overwrites it if it does.
         Use with caution as this can overwrite important files on the device.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_CONTENT_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_CONTENT_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the file was written successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("path", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The path of the file that was written"))
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false,
+            destructiveHint = true,
+        )
+    }
 ) {
     val serial = inputSerial
     val path = inputPath
@@ -216,12 +262,13 @@ private fun createWriteFileTool(
         }
 
         val result = buildJsonObject {
-            put("path", JsonPrimitive(path))
             put("success", JsonPrimitive(true))
+            put("path", JsonPrimitive(path))
         }
 
         CallToolResult(
-            content = listOf(TextContent(result.toString()))
+            structuredContent = result,
+            content = listOf()
         )
     } catch (e: Exception) {
         "Failed to write file: ${e.message}".asStructuredResponse()
@@ -233,14 +280,34 @@ private fun createWriteFileTool(
  */
 private fun createCreateDirectoryTool(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "create-directory",
     description = """
         Creates a directory on the Android device.
         Creates parent directories if they don't exist.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the directory was created successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("path", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The path of the directory that was created"))
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false,
+            destructiveHint = true,
+        )
+    }
 ) {
     val serial = inputSerial
     val path = inputPath
@@ -254,17 +321,16 @@ private fun createCreateDirectoryTool(
         )
 
         if (response.errorOutput.isNotBlank()) {
-            CallToolResult(
-                content = listOf(TextContent("Failed to create directory: ${response.errorOutput}"))
-            )
+            "Failed to create directory: ${response.errorOutput}".asStructuredResponse()
         } else {
             val result = buildJsonObject {
-                put("path", JsonPrimitive(path))
                 put("success", JsonPrimitive(true))
+                put("path", JsonPrimitive(path))
             }
 
             CallToolResult(
-                content = listOf(TextContent(result.toString()))
+                structuredContent = result,
+                content = listOf()
             )
         }
     } catch (e: Exception) {
@@ -277,7 +343,7 @@ private fun createCreateDirectoryTool(
  */
 private fun createDeleteTool(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "delete",
     description = """
@@ -285,7 +351,31 @@ private fun createDeleteTool(
         Use the 'recursive' parameter to delete directories recursively.
         Use with extreme caution as this can delete important files on the device.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_RECURSIVE_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_RECURSIVE_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the delete operation was executed successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("path", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The path that was deleted"))
+            })
+            put("recursive", buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Whether the delete operation was recursive"))
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false,
+            destructiveHint = true,
+        )
+    }
 ) {
     val serial = inputSerial
     val path = inputPath
@@ -307,17 +397,17 @@ private fun createDeleteTool(
         )
 
         if (response.errorOutput.isNotBlank()) {
-            CallToolResult(
-                content = listOf(TextContent("Failed to delete: ${response.errorOutput}"))
-            )
+            "Failed to delete: ${response.errorOutput}".asStructuredResponse()
         } else {
             val result = buildJsonObject {
-                put("path", JsonPrimitive(path))
                 put("success", JsonPrimitive(true))
+                put("path", JsonPrimitive(path))
+                put("recursive", JsonPrimitive(recursive))
             }
 
             CallToolResult(
-                content = listOf(TextContent(result.toString()))
+                structuredContent = result,
+                content = listOf()
             )
         }
     } catch (e: Exception) {
@@ -329,7 +419,7 @@ private fun createDeleteTool(
  * Creates a tool for listing allowed directories on an Android device.
  */
 private fun createListAllowedDirectoriesTool(
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "list-allowed-directories",
     description = """
@@ -337,16 +427,41 @@ private fun createListAllowedDirectoriesTool(
         Use this to understand which directories are available on the Android device before trying to access files.
         This API does not return information about allowed paths on the host system.
     """.trimIndent(),
-    inputSchema = Tool.Input()
+    inputSchema = Tool.Input(),
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the list of allowed directories was retrieved successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("allowedDirectories", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("The list of directories allowed on the Android device"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("string"))
+                })
+            })
+        },
+        required = listOf("success", "allowedDirectories")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = true,
+            openWorldHint = false,
+            destructiveHint = false,
+        )
+    }
 ) {
     CallToolResult(
-        content = listOf(TextContent(buildJsonObject {
+        structuredContent = buildJsonObject {
+            put("success", JsonPrimitive(true))
             put("allowedDirectories", buildJsonArray {
                 allowedPaths.forEach { path ->
                     add(JsonPrimitive(path))
                 }
             })
-        }.toString()))
+        },
+        content = listOf()
     )
 }
 
@@ -355,7 +470,7 @@ private fun createListAllowedDirectoriesTool(
  * Creates a tool for listing allowed directories on an Android device.
  */
 private fun createListAllowedHostDirectoriesTool(
-    hostAllowedPaths: List<String>
+    hostAllowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "list-allowed-host-directories",
     description = """
@@ -363,16 +478,41 @@ private fun createListAllowedHostDirectoriesTool(
         Use this to understand which directories are available on the host system before trying to access files.
         This API does not return information about allowed paths on the android device.
     """.trimIndent(),
-    inputSchema = Tool.Input()
+    inputSchema = Tool.Input(),
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the list of allowed host directories was retrieved successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("allowedDirectories", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("The list of directories allowed on the host system"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("string"))
+                })
+            })
+        },
+        required = listOf("success", "allowedDirectories")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = true,
+            openWorldHint = false,
+            destructiveHint = false,
+        )
+    }
 ) {
     CallToolResult(
-        content = listOf(TextContent(buildJsonObject {
+        structuredContent = buildJsonObject {
+            put("success", JsonPrimitive(true))
             put("allowedDirectories", buildJsonArray {
                 hostAllowedPaths.forEach { path ->
                     add(JsonPrimitive(path))
                 }
             })
-        }.toString()))
+        },
+        content = listOf()
     )
 }
 
@@ -381,7 +521,7 @@ private fun createListAllowedHostDirectoriesTool(
  */
 private fun createMoveFilesTool(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "move-files",
     description = """
@@ -390,7 +530,48 @@ private fun createMoveFilesTool(
         Both source and destination paths for each provided item must be within the allowed paths.
         Use caution as this can overwrite important files on the device.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_MOVE_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_MOVE_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether all move operations were processed",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("operations", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("The list of per-operation results"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("source", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The source file path on the Android device"))
+                        })
+                        put("destination", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The destination file path on the Android device"))
+                        })
+                        put("success", buildJsonObject {
+                            put("type", JsonPrimitive("boolean"))
+                            put("description", JsonPrimitive("Whether the move operation succeeded"))
+                        })
+                        put("error", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("Error message if the operation failed"))
+                        })
+                    })
+                })
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false,
+            destructiveHint = true,
+        )
+    }
 ) {
     val serial = inputSerial
     val operations = inputOperations
@@ -398,6 +579,7 @@ private fun createMoveFilesTool(
 
     try {
         val results = buildJsonObject {
+            put("success", JsonPrimitive(true))
             put("operations", buildJsonArray {
                 operations.forEach { operation ->
                     try {
@@ -439,7 +621,8 @@ private fun createMoveFilesTool(
         }
 
         CallToolResult(
-            content = listOf(TextContent(results.toString()))
+            structuredContent = results,
+            content = listOf()
         )
     } catch (e: Exception) {
         "Failed to process move operations: ${e.message}".asStructuredResponse()
@@ -451,7 +634,7 @@ private fun createMoveFilesTool(
  */
 private fun createReadMultipleFilesTool(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "read-multiple-files",
     description = """
@@ -459,7 +642,48 @@ private fun createReadMultipleFilesTool(
         Returns the file contents as text for each file.
         This helps reduce the number of LLM calls needed when reading multiple files.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the files were processed successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("files", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("Per-file results including path, content (if successful), and errors (if any)"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("path", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The path of the file that was read"))
+                        })
+                        put("content", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The textual content of the file if read successfully"))
+                        })
+                        put("success", buildJsonObject {
+                            put("type", JsonPrimitive("boolean"))
+                            put("description", JsonPrimitive("Whether the file was read successfully"))
+                        })
+                        put("error", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("Error message if the file could not be read"))
+                        })
+                    })
+                })
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = true,
+            openWorldHint = false,
+            destructiveHint = false,
+        )
+    }
 ) {
     val serial = inputSerial
     val paths = inputPaths
@@ -473,6 +697,7 @@ private fun createReadMultipleFilesTool(
 
     try {
         val results = buildJsonObject {
+            put("success", JsonPrimitive(true))
             put("files", buildJsonArray {
                 paths.forEach { path ->
                     try {
@@ -485,7 +710,11 @@ private fun createReadMultipleFilesTool(
                         val error = response.errorOutput.isNotBlank()
                         add(buildJsonObject {
                             put("path", JsonPrimitive(path))
-                            put("error", JsonPrimitive(response.errorOutput))
+                            if (!error) {
+                                put("content", JsonPrimitive(response.output))
+                            } else {
+                                put("error", JsonPrimitive(response.errorOutput))
+                            }
                             put("success", JsonPrimitive(!error))
                         })
                     } catch (e: Exception) {
@@ -500,7 +729,8 @@ private fun createReadMultipleFilesTool(
         }
 
         CallToolResult(
-            content = listOf(TextContent(results.toString()))
+            structuredContent = results,
+            content = listOf()
         )
     } catch (e: Exception) {
         "Failed to read multiple files: ${e.message}".asStructuredResponse()
@@ -512,14 +742,67 @@ private fun createReadMultipleFilesTool(
  */
 private fun createSearchFilesTool(
     adb: AndroidDebugBridgeClient,
-    allowedPaths: List<String>
+    allowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "search-files",
     description = """
         Searches for files on the Android device matching a case-insensitive glob pattern within the specified path or alternative within the allowed paths on the Android device.
         Returns information about each matching file including name, path, size, type.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_SEARCH_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_SEARCH_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether the search operation was executed successfully",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("basePath", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The base path where the search was performed (if provided)"))
+            })
+            put("pattern", buildJsonObject {
+                put("type", JsonPrimitive("string"))
+                put("description", JsonPrimitive("The glob pattern used for the search"))
+            })
+            put("recursive", buildJsonObject {
+                put("type", JsonPrimitive("boolean"))
+                put("description", JsonPrimitive("Whether the search was performed recursively"))
+            })
+            put("matchingFiles", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("List of files matching the search criteria"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("name", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The name of the file"))
+                        })
+                        put("path", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The full path of the matching file"))
+                        })
+                        put("size", buildJsonObject {
+                            put("type", JsonPrimitive("integer"))
+                            put("description", JsonPrimitive("The size of the file in bytes"))
+                        })
+                        put("isDirectory", buildJsonObject {
+                            put("type", JsonPrimitive("boolean"))
+                            put("description", JsonPrimitive("Whether the item is a directory"))
+                        })
+                    })
+                })
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = true,
+            openWorldHint = false,
+            destructiveHint = false,
+        )
+    }
 ) {
     val serial = inputSerial
     val path = arguments["path"]?.jsonPrimitive?.content
@@ -562,15 +845,18 @@ private fun createSearchFilesTool(
         }
 
         val result = buildJsonObject {
-            put("basePath", JsonPrimitive(path))
+            put("success", JsonPrimitive(true))
+            if (path != null) put("basePath", JsonPrimitive(path))
             put("pattern", JsonPrimitive(pattern))
+            put("recursive", JsonPrimitive(recursive))
             put("matchingFiles", buildJsonArray {
                 fileDetails.forEach { add(it) }
             })
         }
 
         CallToolResult(
-            content = listOf(TextContent(result.toString()))
+            structuredContent = result,
+            content = listOf()
         )
     } catch (e: Exception) {
         "Failed to search files: ${e.message}".asStructuredResponse()
@@ -583,7 +869,7 @@ private fun createSearchFilesTool(
 private fun createCopyFileToHostTool(
     adb: AndroidDebugBridgeClient,
     allowedPaths: List<String>,
-    hostAllowedPaths: List<String>
+    hostAllowedPaths: List<String>,
 ): RegisteredTool = createTool(
     name = "copy-file-to-host",
     description = """
@@ -593,13 +879,55 @@ private fun createCopyFileToHostTool(
         This tool works with both text and binary files. This tool does not work for directories.
         Use with caution as this can overwrite existing files on the host system.
     """.trimIndent(),
-    inputSchema = FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT
+    inputSchema = FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT,
+    outputSchema = Tool.Output(
+        properties = buildJsonObject {
+            applyDefaultOutputSchema(
+                successDescription = "Whether all copy operations were processed",
+                messageDescription = "An optional status message informing about errors during execution"
+            )
+            put("operations", buildJsonObject {
+                put("type", JsonPrimitive("array"))
+                put("description", JsonPrimitive("The list of per-operation results"))
+                put("items", buildJsonObject {
+                    put("type", JsonPrimitive("object"))
+                    put("properties", buildJsonObject {
+                        put("android-path", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The source file path on the Android device"))
+                        })
+                        put("host-path", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("The destination file path on the host system"))
+                        })
+                        put("success", buildJsonObject {
+                            put("type", JsonPrimitive("boolean"))
+                            put("description", JsonPrimitive("Whether the copy operation succeeded"))
+                        })
+                        put("error", buildJsonObject {
+                            put("type", JsonPrimitive("string"))
+                            put("description", JsonPrimitive("Error message if the operation failed"))
+                        })
+                    })
+                })
+            })
+        },
+        required = listOf("success")
+    ),
+    annotations = {
+        copy(
+            readOnlyHint = false,
+            openWorldHint = false,
+            destructiveHint = true,
+        )
+    }
 ) {
     val serial = inputSerial
     val operations = inputOperations
     if (operations.isEmpty()) throw ToolException("At least one copy operation must be provided.")
     try {
         val results = buildJsonObject {
+            put("success", JsonPrimitive(true))
             put("operations", buildJsonArray {
                 operations.forEach { operation ->
                     try {
@@ -660,7 +988,8 @@ private fun createCopyFileToHostTool(
         }
 
         CallToolResult(
-            content = listOf(TextContent(results.toString()))
+            structuredContent = results,
+            content = listOf()
         )
     } catch (e: Exception) {
         "Failed to process copy operations: ${e.message}".asStructuredResponse()
