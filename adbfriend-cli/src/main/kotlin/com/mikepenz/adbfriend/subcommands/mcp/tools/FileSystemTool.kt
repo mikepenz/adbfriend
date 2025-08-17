@@ -95,7 +95,7 @@ private fun createListFilesTool(
         val allFiles = adb.listFiles(serial, path, allowedPaths, recursive)
 
         // Build the result JSON
-        val result = buildJsonObject {
+        buildJsonObject {
             put("success", JsonPrimitive(true))
             put("path", JsonPrimitive(path))
             put("recursive", JsonPrimitive(recursive))
@@ -113,8 +113,7 @@ private fun createListFilesTool(
                     }
                 }
             })
-        }
-        result.asStructuredResponse()
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to list files: ${e.message}".asStructuredResponse()
     }
@@ -173,12 +172,11 @@ private fun createReadFileTool(
         if (response.errorOutput.isNotBlank()) {
             "Failed to read file: ${response.errorOutput}".asStructuredResponse()
         } else {
-            val result = buildJsonObject {
+            buildJsonObject {
                 put("success", JsonPrimitive(true))
                 put("path", JsonPrimitive(path))
                 put("content", JsonPrimitive(response.output))
-            }
-            result.asStructuredResponse()
+            }.asStructuredResponse()
         }
     } catch (e: Exception) {
         "Failed to read file: ${e.message}".asStructuredResponse()
@@ -253,11 +251,10 @@ private fun createWriteFileTool(
             tempFile.delete()
         }
 
-        val result = buildJsonObject {
+        buildJsonObject {
             put("success", JsonPrimitive(true))
             put("path", JsonPrimitive(path))
-        }
-        result.asStructuredResponse()
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to write file: ${e.message}".asStructuredResponse()
     }
@@ -311,11 +308,10 @@ private fun createCreateDirectoryTool(
         if (response.errorOutput.isNotBlank()) {
             "Failed to create directory: ${response.errorOutput}".asStructuredResponse()
         } else {
-            val result = buildJsonObject {
+            buildJsonObject {
                 put("success", JsonPrimitive(true))
                 put("path", JsonPrimitive(path))
-            }
-            result.asStructuredResponse()
+            }.asStructuredResponse()
         }
     } catch (e: Exception) {
         "Failed to create directory: ${e.message}".asStructuredResponse()
@@ -383,12 +379,11 @@ private fun createDeleteTool(
         if (response.errorOutput.isNotBlank()) {
             "Failed to delete: ${response.errorOutput}".asStructuredResponse()
         } else {
-            val result = buildJsonObject {
+            buildJsonObject {
                 put("success", JsonPrimitive(true))
                 put("path", JsonPrimitive(path))
                 put("recursive", JsonPrimitive(recursive))
-            }
-            result.asStructuredResponse()
+            }.asStructuredResponse()
         }
     } catch (e: Exception) {
         "Failed to delete: ${e.message}".asStructuredResponse()
@@ -432,17 +427,14 @@ private fun createListAllowedDirectoriesTool(
         )
     }
 ) {
-    CallToolResult(
-        structuredContent = buildJsonObject {
-            put("success", JsonPrimitive(true))
-            put("allowedDirectories", buildJsonArray {
-                allowedPaths.forEach { path ->
-                    add(JsonPrimitive(path))
-                }
-            })
-        },
-        content = listOf()
-    )
+    buildJsonObject {
+        put("success", JsonPrimitive(true))
+        put("allowedDirectories", buildJsonArray {
+            allowedPaths.forEach { path ->
+                add(JsonPrimitive(path))
+            }
+        })
+    }.asStructuredResponse()
 }
 
 
@@ -483,17 +475,14 @@ private fun createListAllowedHostDirectoriesTool(
         )
     }
 ) {
-    CallToolResult(
-        structuredContent = buildJsonObject {
-            put("success", JsonPrimitive(true))
-            put("allowedDirectories", buildJsonArray {
-                hostAllowedPaths.forEach { path ->
-                    add(JsonPrimitive(path))
-                }
-            })
-        },
-        content = listOf()
-    )
+    buildJsonObject {
+        put("success", JsonPrimitive(true))
+        put("allowedDirectories", buildJsonArray {
+            hostAllowedPaths.forEach { path ->
+                add(JsonPrimitive(path))
+            }
+        })
+    }.asStructuredResponse()
 }
 
 /**
@@ -558,7 +547,7 @@ private fun createMoveFilesTool(
     if (operations.isEmpty()) throw ToolException("At least one move operation must be provided.")
 
     try {
-        val results = buildJsonObject {
+        buildJsonObject {
             put("success", JsonPrimitive(true))
             put("operations", buildJsonArray {
                 operations.forEach { operation ->
@@ -598,8 +587,7 @@ private fun createMoveFilesTool(
                     }
                 }
             })
-        }
-        results.asStructuredResponse()
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to process move operations: ${e.message}".asStructuredResponse()
     }
@@ -672,7 +660,7 @@ private fun createReadMultipleFilesTool(
     }
 
     try {
-        val results = buildJsonObject {
+        buildJsonObject {
             put("success", JsonPrimitive(true))
             put("files", buildJsonArray {
                 paths.forEach { path ->
@@ -702,8 +690,7 @@ private fun createReadMultipleFilesTool(
                     }
                 }
             })
-        }
-        results.asStructuredResponse()
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to read multiple files: ${e.message}".asStructuredResponse()
     }
@@ -816,7 +803,7 @@ private fun createSearchFilesTool(
             }
         }
 
-        val result = buildJsonObject {
+        buildJsonObject {
             put("success", JsonPrimitive(true))
             if (path != null) put("basePath", JsonPrimitive(path))
             put("pattern", JsonPrimitive(pattern))
@@ -824,8 +811,7 @@ private fun createSearchFilesTool(
             put("matchingFiles", buildJsonArray {
                 fileDetails.forEach { add(it) }
             })
-        }
-        result.asStructuredResponse()
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to search files: ${e.message}".asStructuredResponse()
     }
@@ -894,7 +880,7 @@ private fun createCopyFileToHostTool(
     val operations = inputOperations
     if (operations.isEmpty()) throw ToolException("At least one copy operation must be provided.")
     try {
-        val results = buildJsonObject {
+        buildJsonObject {
             put("success", JsonPrimitive(true))
             put("operations", buildJsonArray {
                 operations.forEach { operation ->
@@ -953,9 +939,7 @@ private fun createCopyFileToHostTool(
                     }
                 }
             })
-        }
-
-        results.asStructuredResponse()
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to process copy operations: ${e.message}".asStructuredResponse()
     }

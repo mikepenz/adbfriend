@@ -174,7 +174,7 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
             } else {
                 val results = block(adb, serial, packageNames.map { it.jsonPrimitive.content }.toTypedArray())
 
-                val result = buildJsonObject {
+                buildJsonObject {
                     put("success", JsonPrimitive(true))
                     put("results", buildJsonArray {
                         results.onEach { (packageName, result) ->
@@ -184,8 +184,7 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                             })
                         }
                     })
-                }
-                result.asStructuredResponse()
+                }.asStructuredResponse()
             }
         }
     )

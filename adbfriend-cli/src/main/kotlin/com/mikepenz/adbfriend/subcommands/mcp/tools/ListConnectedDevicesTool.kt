@@ -78,7 +78,7 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
     val serial = arguments["serial"]?.jsonPrimitive?.content?.trim()
     val name = arguments["name"]?.jsonPrimitive?.content?.trim()
 
-    val result = buildJsonObject {
+    buildJsonObject {
         put("success", JsonPrimitive(true))
         put("devices", buildJsonArray {
             devices.onEach { device ->
@@ -95,6 +95,5 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
                 }
             }
         })
-    }
-    result.asStructuredResponse()
+    }.asStructuredResponse()
 }
