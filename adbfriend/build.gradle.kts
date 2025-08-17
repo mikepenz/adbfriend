@@ -45,7 +45,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ADBFriend"
-            packageVersion = property("VERSION_NAME").toString()
+            packageVersion = property("VERSION_NAME").toString().substringBefore("-")
             description = ""
             copyright = "© 2025 Mike Penz. All rights reserved."
         }
