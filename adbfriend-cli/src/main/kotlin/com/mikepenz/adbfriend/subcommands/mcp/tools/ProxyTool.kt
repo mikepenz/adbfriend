@@ -137,7 +137,7 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
         }
 
         // Build the result JSON
-        val result = buildJsonObject {
+        buildJsonObject {
             put("serial", JsonPrimitive(serial))
             put("success", JsonPrimitive(success))
             put("enabled", JsonPrimitive(enabled))
@@ -152,8 +152,7 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
             if (!success) {
                 put("error", JsonPrimitive(error))
             }
-        }
-        result.asStructuredResponse()
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to configure proxy: ${e.message}".asStructuredResponse()
     }

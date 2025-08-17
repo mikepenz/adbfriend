@@ -95,7 +95,7 @@ fun createGetInstalledPackagesTool(adb: AndroidDebugBridgeClient): RegisteredToo
         filtered = filtered.filter { regex.matches(it.packageName) }
     }
 
-    val result = buildJsonObject {
+    buildJsonObject {
         put("success", JsonPrimitive(true))
         put("packages", buildJsonArray {
             filtered.onEach { pack ->
@@ -106,6 +106,5 @@ fun createGetInstalledPackagesTool(adb: AndroidDebugBridgeClient): RegisteredToo
                 })
             }
         })
-    }
-    result.asStructuredResponse()
+    }.asStructuredResponse()
 }

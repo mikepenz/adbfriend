@@ -306,13 +306,12 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
         }
 
         // Build the final result
-        val result = buildJsonObject {
+        buildJsonObject {
             put("success", JsonPrimitive(true))
             put("serial", JsonPrimitive(serial))
             put("completeSuccess", JsonPrimitive(completeSuccess))
             put("operations", JsonArray(results))
-        }
-        result.asStructuredResponse()
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to configure device for testing: ${e.message}".asStructuredResponse()
     }

@@ -90,27 +90,12 @@ fun createInstallApkTool(
         // Check if installation was successful
         val success = installResponse.output.trim().contains("Success")
 
-        if (success) {
-            // Return success result
-            CallToolResult(
-                structuredContent = buildJsonObject {
-                    put("success", JsonPrimitive(true))
-                    put("apk_path", JsonPrimitive(apkPath))
-                    put("message", JsonPrimitive("APK installed successfully"))
-                },
-                content = listOf()
-            )
-        } else {
-            // Return error result
-            CallToolResult(
-                structuredContent = buildJsonObject {
-                    put("success", JsonPrimitive(false))
-                    put("apk_path", JsonPrimitive(apkPath))
-                    put("message", JsonPrimitive("Failed to install APK: ${installResponse.output.trim()}"))
-                },
-                content = listOf()
-            )
-        }
+        buildJsonObject {
+            put("success", JsonPrimitive(success))
+            put("apk_path", JsonPrimitive(apkPath))
+            val message = if (success) "APK installed successfully" else "Failed to install APK: ${installResponse.output.trim()}"
+            put("message", JsonPrimitive(message))
+        }.asStructuredResponse()
     } catch (e: Exception) {
         "Failed to install APK: ${e.message}".asStructuredResponse()
     }
