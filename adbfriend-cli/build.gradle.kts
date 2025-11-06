@@ -25,6 +25,7 @@ kotlin {
             implementation(libs.kotlinx.io.core)
             implementation(libs.mcp.kotlin)
             implementation(platform(libs.ktor.bom))
+            implementation("io.ktor:ktor-server-netty")
         }
     }
 }

@@ -2,8 +2,8 @@ package com.mikepenz.adbfriend.subcommands.mcp.utils
 
 import adbfriend_root.adbfriend_cli.BuildConfig
 import com.mikepenz.adbfriend.subcommands.mcp.SseOptions
-import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import io.ktor.server.netty.*
 import io.ktor.utils.io.streams.*
 import io.modelcontextprotocol.kotlin.sdk.Implementation
 import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
@@ -16,7 +16,7 @@ suspend fun setupServer(sseOptions: SseOptions?, builtTools: List<RegisteredTool
     val server = configureServer(builtTools)
     if (sseOptions?.sse == true) {
         if (enableLog) echo("Starting SSE MCP server on port ${sseOptions.port}")
-        embeddedServer(CIO, host = "0.0.0.0", port = sseOptions.port) {
+        embeddedServer(Netty, host = "0.0.0.0", port = sseOptions.port) {
             mcp {
                 server
             }

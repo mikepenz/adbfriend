@@ -13,12 +13,15 @@ fun createTool(
     description: String?,
     /** A JSON object defining the expected parameters for the tool. */
     inputSchema: Input,
+    /** The title of the tool. */
+    title: String = name,
     outputSchema: Tool.Output = Tool.Output(),
     annotations: ToolAnnotations.() -> ToolAnnotations = { this },
     handler: suspend CallToolRequest.() -> CallToolResult,
 ): RegisteredTool = RegisteredTool(
     Tool(
         name = name,
+        title = title,
         description = description,
         inputSchema = inputSchema,
         outputSchema = outputSchema,
