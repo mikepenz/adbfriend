@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.terminal
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.switch
 import com.github.ajalt.mordant.terminal.YesNoPrompt
 import com.malinskiy.adam.request.device.Device
 import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
@@ -17,6 +18,10 @@ class Test : AdbCommand() {
     private val touches: Boolean by option().flag().help("Also enables touches when configuring for tests (`--reset` will disable again)")
     private val unlock: Boolean by option().flag().help("Attempts to unlock the device by sending (`keyevent 82`)")
     private val collapse: Boolean by option().flag().help("Attempts to collapse the statusbar")
+    private val stayOn: Boolean? by option().switch(
+        "--stay-on" to true,
+        "--no-stay-on" to false
+    ).help("Keeps device awake while USB connected (`svc power stayon usb`). Use --stay-on to enable, --no-stay-on to disable.")
     private val force: Boolean by option().flag().help("Skips all warning prompts, and applies settings without confirmation.")
 
     override fun help(context: Context) = """
@@ -116,6 +121,20 @@ class Test : AdbCommand() {
                 if (collapse) {
                     adb.execute(request = ShellCommandRequest("cmd statusbar collapse"), serial = device.serial)
                     echo("  ℹ\uFE0F Statusbar collapse attempted.")
+                }
+
+                if (stayOn != null) {
+                    val command = if (stayOn == true) {
+                        "svc power stayon usb"
+                    } else {
+                        "svc power stayon false"
+                    }
+                    adb.execute(
+                        request = ShellCommandRequest(command), serial = device.serial
+                    ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
+                        completeSuccess = false
+                        echo("  ⚠\uFE0F Failed to set stay-on mode ($it)")
+                    } ?: echo("  ✅ Stay-on mode ${if (stayOn == true) "enabled (usb)" else "disabled"}.")
                 }
             }
 
