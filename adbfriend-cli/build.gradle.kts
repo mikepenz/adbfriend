@@ -31,7 +31,7 @@ kotlin {
 }
 
 application {
-    applicationName = "adbfriend"
+    applicationName = "adbfriend-cli"
     mainClass = "com.mikepenz.adbfriend.MainKt"
     version = property("VERSION_NAME").toString()
 }
@@ -41,9 +41,6 @@ buildConfig {
 }
 
 aboutLibraries {
-    android {
-        registerAndroidTasks = false
-    }
     library {
         duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
     }
