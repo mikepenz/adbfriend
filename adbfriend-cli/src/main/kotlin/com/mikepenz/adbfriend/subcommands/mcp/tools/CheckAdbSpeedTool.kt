@@ -5,10 +5,10 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import com.mikepenz.adbfriend.utils.usbProtocolParser
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.TextContent
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.CallToolResult
+import io.modelcontextprotocol.kotlin.sdk.types.TextContent
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
@@ -20,7 +20,7 @@ fun createCheckAdbSpeedTool(): RegisteredTool = createTool(
         Checks the usb connection speed of the Android device for the provided serial.
     """.trimIndent(),
     inputSchema = SERIAL_ONLY_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(messageDescription = "A message containing the USB connection speed or an error message. In case of failure, the message will contain the error details.")
         },

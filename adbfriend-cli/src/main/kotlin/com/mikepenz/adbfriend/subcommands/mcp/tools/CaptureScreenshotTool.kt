@@ -5,8 +5,8 @@ import com.malinskiy.adam.request.framebuffer.RawImageScreenCaptureAdapter
 import com.malinskiy.adam.request.framebuffer.ScreenCaptureRequest
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
 import com.mikepenz.adbfriend.subcommands.mcp.utils.*
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import java.io.File
@@ -19,7 +19,7 @@ fun createCaptureScreenshotTool(adb: AndroidDebugBridgeClient, hostAllowedPaths:
         Use with caution as this can overwrite existing files on the host system.
     """.trimIndent(),
     inputSchema = CAPTURE_SCREENSHOT_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the screenshot was captured successfully",

@@ -1,6 +1,6 @@
 package com.mikepenz.adbfriend.subcommands.mcp.tools
 
-import io.modelcontextprotocol.kotlin.sdk.Tool
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -25,7 +25,7 @@ internal val OUTPUT_PATH_INPUT = buildJsonObject {
     put("description", JsonPrimitive("The path on the host system where the file should be saved. If not provided, a default path will be used."))
 }
 
-internal val SERIAL_ONLY_TOOL_INPUT = Tool.Input(
+internal val SERIAL_ONLY_TOOL_INPUT = ToolSchema(
     properties = JsonObject(
         mapOf(
             "serial" to SERIAL_INPUT
@@ -34,7 +34,7 @@ internal val SERIAL_ONLY_TOOL_INPUT = Tool.Input(
     required = listOf("serial")
 )
 
-internal val DEVICE_FILTER_TOOL_INPUT = Tool.Input(
+internal val DEVICE_FILTER_TOOL_INPUT = ToolSchema(
     properties = JsonObject(
         mapOf(
             "serial" to SERIAL_INPUT,
@@ -50,7 +50,7 @@ internal val DEVICE_FILTER_TOOL_INPUT = Tool.Input(
 )
 
 // Input schema for file system operations
-internal val FILE_SYSTEM_TOOL_INPUT = Tool.Input(
+internal val FILE_SYSTEM_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("path", PATH_INPUT)
@@ -59,7 +59,7 @@ internal val FILE_SYSTEM_TOOL_INPUT = Tool.Input(
 )
 
 // Input schema for file system operations with content
-internal val FILE_SYSTEM_CONTENT_TOOL_INPUT = Tool.Input(
+internal val FILE_SYSTEM_CONTENT_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("path", PATH_INPUT)
@@ -72,7 +72,7 @@ internal val FILE_SYSTEM_CONTENT_TOOL_INPUT = Tool.Input(
 )
 
 // Input schema for file system operations with recursive option
-internal val FILE_SYSTEM_RECURSIVE_TOOL_INPUT = Tool.Input(
+internal val FILE_SYSTEM_RECURSIVE_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("path", PATH_INPUT)
@@ -86,7 +86,7 @@ internal val FILE_SYSTEM_RECURSIVE_TOOL_INPUT = Tool.Input(
 )
 
 // Input schema for file search operations
-internal val FILE_SYSTEM_SEARCH_TOOL_INPUT = Tool.Input(
+internal val FILE_SYSTEM_SEARCH_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("path", PATH_INPUT)
@@ -104,7 +104,7 @@ internal val FILE_SYSTEM_SEARCH_TOOL_INPUT = Tool.Input(
 )
 
 // Input schema for file move operations
-internal val FILE_SYSTEM_MOVE_TOOL_INPUT = Tool.Input(
+internal val FILE_SYSTEM_MOVE_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("operations", buildJsonObject {
@@ -129,7 +129,7 @@ internal val FILE_SYSTEM_MOVE_TOOL_INPUT = Tool.Input(
 )
 
 // Input schema for reading multiple files
-internal val FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT = Tool.Input(
+internal val FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("paths", buildJsonObject {
@@ -144,7 +144,7 @@ internal val FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT = Tool.Input(
 )
 
 // Input schema for copying a file from device to host
-internal val FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT = Tool.Input(
+internal val FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("operations", buildJsonObject {
@@ -168,7 +168,7 @@ internal val FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT = Tool.Input(
     required = listOf("serial", "operations")
 )
 
-internal val CAPTURE_SCREENSHOT_TOOL_INPUT = Tool.Input(
+internal val CAPTURE_SCREENSHOT_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("output-path", OUTPUT_PATH_INPUT)
@@ -176,7 +176,7 @@ internal val CAPTURE_SCREENSHOT_TOOL_INPUT = Tool.Input(
     required = listOf("serial", "output-path")
 )
 
-internal val INSTALL_APK_TOOL_INPUT = Tool.Input(
+internal val INSTALL_APK_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("apk-path", buildJsonObject {

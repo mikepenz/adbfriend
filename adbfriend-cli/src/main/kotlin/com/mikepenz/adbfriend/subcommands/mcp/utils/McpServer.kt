@@ -5,9 +5,9 @@ import com.mikepenz.adbfriend.subcommands.mcp.SseOptions
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.utils.io.streams.*
-import io.modelcontextprotocol.kotlin.sdk.Implementation
-import io.modelcontextprotocol.kotlin.sdk.ServerCapabilities
 import io.modelcontextprotocol.kotlin.sdk.server.*
+import io.modelcontextprotocol.kotlin.sdk.types.Implementation
+import io.modelcontextprotocol.kotlin.sdk.types.ServerCapabilities
 import kotlinx.coroutines.Job
 import kotlinx.io.asSink
 import kotlinx.io.buffered
@@ -28,7 +28,7 @@ suspend fun setupServer(sseOptions: SseOptions?, builtTools: List<RegisteredTool
             System.out.asSink().buffered()
         )
 
-        server.connect(transport)
+        server.createSession(transport)
         val done = Job()
         server.onClose {
             done.complete()

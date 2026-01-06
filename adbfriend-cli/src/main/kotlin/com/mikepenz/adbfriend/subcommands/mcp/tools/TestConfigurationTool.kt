@@ -6,15 +6,14 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
 import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.serialization.json.*
 
 /**
  * Input schema for test configuration operations
  */
-internal val TEST_CONFIGURATION_TOOL_INPUT = Tool.Input(
+internal val TEST_CONFIGURATION_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("animations", buildJsonObject {
@@ -63,7 +62,7 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
         unlock the device, and collapse the statusbar.
     """.trimIndent(),
     inputSchema = TEST_CONFIGURATION_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the device configuration operations executed successfully",
@@ -122,12 +121,12 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
     }
 ) {
     val serial = inputSerial
-    val animations = arguments["animations"]?.jsonPrimitive?.booleanOrNull ?: true
-    val immersiveMode = arguments["immersiveMode"]?.jsonPrimitive?.booleanOrNull ?: false
-    val resetAutofill = arguments["resetAutofill"]?.jsonPrimitive?.booleanOrNull ?: false
-    val touches = arguments["touches"]?.jsonPrimitive?.booleanOrNull ?: false
-    val unlock = arguments["unlock"]?.jsonPrimitive?.booleanOrNull ?: false
-    val collapse = arguments["collapse"]?.jsonPrimitive?.booleanOrNull ?: false
+    val animations = arguments?.get("animations")?.jsonPrimitive?.booleanOrNull ?: true
+    val immersiveMode = arguments?.get("immersiveMode")?.jsonPrimitive?.booleanOrNull ?: false
+    val resetAutofill = arguments?.get("resetAutofill")?.jsonPrimitive?.booleanOrNull ?: false
+    val touches = arguments?.get("touches")?.jsonPrimitive?.booleanOrNull ?: false
+    val unlock = arguments?.get("unlock")?.jsonPrimitive?.booleanOrNull ?: false
+    val collapse = arguments?.get("collapse")?.jsonPrimitive?.booleanOrNull ?: false
 
     try {
         // Track success of operations
