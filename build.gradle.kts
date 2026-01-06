@@ -10,5 +10,5 @@ plugins {
     alias(libs.plugins.shadow) apply false
     alias(libs.plugins.buildconfig) apply false
     alias(baseLibs.plugins.versionCatalogUpdate) apply false
-    alias(baseLibs.plugins.compatPatrouille) apply false
+    alias(baseLibs.plugins.tapmoc) apply false
 }
