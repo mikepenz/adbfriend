@@ -10,9 +10,8 @@ import com.malinskiy.adam.request.sync.v2.PushFileRequest
 import com.mikepenz.adbfriend.extensions.escapeForSync
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
 import com.mikepenz.adbfriend.subcommands.mcp.utils.*
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -35,7 +34,7 @@ private fun createListFilesTool(
         Use the 'recursive' parameter to list files in subdirectories recursively.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_RECURSIVE_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema()
             put("path", buildJsonObject {
@@ -133,7 +132,7 @@ private fun createReadFileTool(
         This API will not work for binary files.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the file was read successfully",
@@ -197,7 +196,7 @@ private fun createWriteFileTool(
         Use with caution as this can overwrite important files on the device.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_CONTENT_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the file was written successfully",
@@ -273,7 +272,7 @@ private fun createCreateDirectoryTool(
         Creates parent directories if they don't exist.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the directory was created successfully",
@@ -332,7 +331,7 @@ private fun createDeleteTool(
         Use with extreme caution as this can delete important files on the device.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_RECURSIVE_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the delete operation was executed successfully",
@@ -402,8 +401,8 @@ private fun createListAllowedDirectoriesTool(
         Use this to understand which directories are available on the Android device before trying to access files.
         This API does not return information about allowed paths on the host system.
     """.trimIndent(),
-    inputSchema = Tool.Input(),
-    outputSchema = Tool.Output(
+    inputSchema = ToolSchema(),
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the list of allowed directories was retrieved successfully",
@@ -450,8 +449,8 @@ private fun createListAllowedHostDirectoriesTool(
         Use this to understand which directories are available on the host system before trying to access files.
         This API does not return information about allowed paths on the android device.
     """.trimIndent(),
-    inputSchema = Tool.Input(),
-    outputSchema = Tool.Output(
+    inputSchema = ToolSchema(),
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the list of allowed host directories was retrieved successfully",
@@ -500,7 +499,7 @@ private fun createMoveFilesTool(
         Use caution as this can overwrite important files on the device.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_MOVE_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether all move operations were processed",
@@ -607,7 +606,7 @@ private fun createReadMultipleFilesTool(
         This helps reduce the number of LLM calls needed when reading multiple files.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_MULTIPLE_FILES_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the files were processed successfully",
@@ -709,7 +708,7 @@ private fun createSearchFilesTool(
         Returns information about each matching file including name, path, size, type.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_SEARCH_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the search operation was executed successfully",
@@ -764,8 +763,8 @@ private fun createSearchFilesTool(
     }
 ) {
     val serial = inputSerial
-    val path = arguments["path"]?.jsonPrimitive?.content
-    val pattern = arguments["pattern"]?.jsonPrimitive?.content
+    val path = arguments?.get("path")?.jsonPrimitive?.content
+    val pattern = arguments?.get("pattern")?.jsonPrimitive?.content
         ?: throw ToolException("The 'pattern' parameter is required.")
     val recursive = inputRecursive
 
@@ -834,7 +833,7 @@ private fun createCopyFileToHostTool(
         Use with caution as this can overwrite existing files on the host system.
     """.trimIndent(),
     inputSchema = FILE_SYSTEM_COPY_TO_HOST_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether all copy operations were processed",

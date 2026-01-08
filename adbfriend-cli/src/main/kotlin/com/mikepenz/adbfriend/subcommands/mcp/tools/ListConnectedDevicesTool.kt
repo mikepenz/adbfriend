@@ -6,9 +6,8 @@ import com.mikepenz.adbfriend.extensions.fetchModel
 import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
 import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.serialization.json.*
 
 fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Device>): RegisteredTool = createTool(
@@ -18,7 +17,7 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
         For each device `serial`, `model` and `state` will be returned.
         The `serial` is the common identifier used to access any other device specific tool.
     """.trimIndent(),
-    inputSchema = Tool.Input(
+    inputSchema = ToolSchema(
         properties = JsonObject(
             mapOf(
                 "serial" to JsonObject(
@@ -37,7 +36,7 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
         ),
         required = listOf()
     ),
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the connected devices were retrieved successfully",
@@ -75,8 +74,8 @@ fun createConnectedDevicesTool(adb: AndroidDebugBridgeClient, devices: List<Devi
         )
     }
 ) {
-    val serial = arguments["serial"]?.jsonPrimitive?.content?.trim()
-    val name = arguments["name"]?.jsonPrimitive?.content?.trim()
+    val serial = arguments?.get("serial")?.jsonPrimitive?.content?.trim()
+    val name = arguments?.get("name")?.jsonPrimitive?.content?.trim()
 
     buildJsonObject {
         put("success", JsonPrimitive(true))

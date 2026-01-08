@@ -5,10 +5,9 @@ import com.malinskiy.adam.request.shell.v2.ShellCommandRequest
 import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
 import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
-import io.modelcontextprotocol.kotlin.sdk.CallToolRequest
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.CallToolRequest
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.serialization.json.*
 
 
@@ -79,7 +78,7 @@ fun createInstalledPackageTools(adb: AndroidDebugBridgeClient) = buildList {
             If the 'keep-data' flag is set to true, associated data will not be removed, and only the application will be uninstalled.
         """.trimIndent(),
     ) { adb, serial, packageNames ->
-        val keepData = arguments["keep-data"]?.jsonPrimitive?.booleanOrNull ?: false
+        val keepData = arguments?.get("keep-data")?.jsonPrimitive?.booleanOrNull ?: false
 
         packageNames.associateWith { p ->
             adb.execute(
@@ -111,7 +110,7 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
         createTool(
             name = name,
             description = description,
-            inputSchema = Tool.Input(
+            inputSchema = ToolSchema(
                 properties = buildJsonObject {
                     extraProperties.onEach { put(it.key, it.value) }
                     put("serial", buildJsonObject {
@@ -130,7 +129,7 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                     "serial", "package-names"
                 )
             ),
-            outputSchema = Tool.Output(
+            outputSchema = ToolSchema(
                 properties = buildJsonObject {
                     applyDefaultOutputSchema(
                         successDescription = "Whether the operation was executed successfully",
@@ -164,8 +163,8 @@ private fun MutableList<RegisteredTool>.addInstalledPackageTool(
                 )
             }
         ) {
-            val serial = arguments["serial"]?.jsonPrimitive?.content?.trim()
-            val packageNames = arguments["package-names"]?.jsonArray
+            val serial = arguments?.get("serial")?.jsonPrimitive?.content?.trim()
+            val packageNames = arguments?.get("package-names")?.jsonArray
 
             if (serial.isNullOrBlank()) {
                 "The 'serial' parameter is required.".asStructuredResponse()

@@ -6,15 +6,14 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.applyDefaultOutputSchema
 import com.mikepenz.adbfriend.subcommands.mcp.utils.asStructuredResponse
 import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.serialization.json.*
 
 /**
  * Input schema for proxy configuration operations
  */
-internal val PROXY_TOOL_INPUT = Tool.Input(
+internal val PROXY_TOOL_INPUT = ToolSchema(
     properties = buildJsonObject {
         put("serial", SERIAL_INPUT)
         put("enabled", buildJsonObject {
@@ -48,7 +47,7 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
         Uses the global http_proxy setting which affects system-wide network connections.
     """.trimIndent(),
     inputSchema = PROXY_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the proxy configuration was successful",
@@ -94,9 +93,9 @@ fun createProxyTool(adb: AndroidDebugBridgeClient): RegisteredTool = createTool(
     }
 ) {
     val serial = inputSerial
-    val enabled = arguments["enabled"]?.jsonPrimitive?.booleanOrNull ?: true
-    val host = arguments["host"]?.jsonPrimitive?.contentOrNull
-    val port = arguments["port"]?.jsonPrimitive?.intOrNull
+    val enabled = arguments?.get("enabled")?.jsonPrimitive?.booleanOrNull ?: true
+    val host = arguments?.get("host")?.jsonPrimitive?.contentOrNull
+    val port = arguments?.get("port")?.jsonPrimitive?.intOrNull
 
     try {
         val proxyValue = if (enabled) {

@@ -6,9 +6,8 @@ import com.malinskiy.adam.request.pkg.InstallRemotePackageRequest
 import com.malinskiy.adam.request.sync.v2.PushFileRequest
 import com.mikepenz.adbfriend.subcommands.mcp.exception.ToolException
 import com.mikepenz.adbfriend.subcommands.mcp.utils.*
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.JsonPrimitive
@@ -30,7 +29,7 @@ fun createInstallApkTool(
         Use with caution as this can install potentially harmful applications.
     """.trimIndent(),
     inputSchema = INSTALL_APK_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the APK was installed successfully",

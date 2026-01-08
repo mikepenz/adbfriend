@@ -8,9 +8,8 @@ import com.mikepenz.adbfriend.subcommands.mcp.utils.createTool
 import com.mikepenz.adbfriend.subcommands.mcp.utils.inputSerial
 import com.mikepenz.adbfriend.utils.convertGlobToRegex
 import com.mikepenz.adbfriend.utils.packageParser
-import io.modelcontextprotocol.kotlin.sdk.CallToolResult
-import io.modelcontextprotocol.kotlin.sdk.Tool
 import io.modelcontextprotocol.kotlin.sdk.server.RegisteredTool
+import io.modelcontextprotocol.kotlin.sdk.types.ToolSchema
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
@@ -25,7 +24,7 @@ fun createGetInstalledPackagesTool(adb: AndroidDebugBridgeClient): RegisteredToo
         Use the `third-party-only` flag to filter out system applications and only show third-party applications.
     """.trimIndent(),
     inputSchema = DEVICE_FILTER_TOOL_INPUT,
-    outputSchema = Tool.Output(
+    outputSchema = ToolSchema(
         properties = buildJsonObject {
             applyDefaultOutputSchema(
                 successDescription = "Whether the installed packages were retrieved successfully",
@@ -65,8 +64,8 @@ fun createGetInstalledPackagesTool(adb: AndroidDebugBridgeClient): RegisteredToo
 ) {
     val serial = inputSerial
 
-    val packageGlob = arguments["package-filter"]?.jsonPrimitive?.content
-    val thirdPartyOnly = arguments["third-party-only"]?.jsonPrimitive?.content?.toBoolean() ?: false
+    val packageGlob = arguments?.get("package-filter")?.jsonPrimitive?.content
+    val thirdPartyOnly = arguments?.get("third-party-only")?.jsonPrimitive?.content?.toBoolean() ?: false
     val regex = if (packageGlob != null) convertGlobToRegex(packageGlob) else null
 
     // Get all packages using dumpsys
