@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew adbfriend-cli:shadowDistZip
 
       - name: Archive Artifacts
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: "adbfriend-cli"
           path: adbfriend-cli/build/distributions/
