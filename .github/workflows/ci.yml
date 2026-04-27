@@ -47,7 +47,7 @@ jobs:
 
       - name: Build Changelog
         id: github_release
-        uses: mikepenz/release-changelog-builder-action@v6
+        uses: mikepenz/release-changelog-builder-action@bcae7115752d4ed746ff92feb666574428a79415 # v6
         if: startsWith(github.ref, 'refs/tags/')
         with:
           configuration: ".github/config/configuration.json"
@@ -63,7 +63,7 @@ jobs:
           npx @anthropic-ai/dxt pack adbfriend-cli-shadow-${{ github.ref_name }}
 
       - name: Release
-        uses: mikepenz/action-gh-release@v2
+        uses: mikepenz/action-gh-release@5c3d16ffbdc3e0fbfe2c8a69a448798f5d9b30c2 # v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           body: ${{steps.github_release.outputs.changelog}}
