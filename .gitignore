@@ -16,3 +16,4 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 /.kotlin/metadata/
+.claude/*.local.json
