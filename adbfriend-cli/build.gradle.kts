@@ -45,7 +45,7 @@ aboutLibraries {
         duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
     }
     export {
-        outputPath = file("src/main/composeResources/files/aboutlibraries.json")
+        outputFile = file("src/main/composeResources/files/aboutlibraries.json")
     }
 }
 
