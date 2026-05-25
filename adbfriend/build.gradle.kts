@@ -53,14 +53,11 @@ compose.desktop {
 }
 
 aboutLibraries {
-    android {
-        registerAndroidTasks = false
-    }
     library {
         duplicationMode = com.mikepenz.aboutlibraries.plugin.DuplicateMode.MERGE
     }
     export {
-        outputPath = file("src/main/composeResources/jvmMain/aboutlibraries.json")
+        outputFile = file("src/main/composeResources/jvmMain/aboutlibraries.json")
     }
 }
 
