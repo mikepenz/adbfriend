@@ -26,7 +26,7 @@ suspend fun setupServer(sseOptions: SseOptions?, builtTools: List<RegisteredTool
         val transport = StdioServerTransport(
             System.`in`.asInput(),
             System.out.asSink().buffered()
-        )
+        ) {}
 
         server.createSession(transport)
         val done = Job()
