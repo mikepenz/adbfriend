@@ -5,7 +5,7 @@ mordant = "3.0.2"
 slf4j = "2.0.18"
 shadow = "9.6.1"
 buildconfig = "6.0.10"
-mcp = "0.14.0"
+mcp = "0.15.0"
 kotlinx-io = "0.9.1"
 ktor = "3.5.1"
 
