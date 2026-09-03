@@ -37,7 +37,9 @@ application {
     applicationDefaultJvmArgs = listOf("--enable-native-access=ALL-UNNAMED")
 }
 
-tasks.named<JavaExec>("run") {
+// Covers `./gradlew run` as well as ad-hoc JavaExec tasks IDEs generate for "Run main()",
+// which don't go through the `application` block's `applicationDefaultJvmArgs`.
+tasks.withType<JavaExec>().configureEach {
     jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
 
