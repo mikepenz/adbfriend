@@ -13,7 +13,7 @@ import kotlin.system.exitProcess
 
 class Test : AdbCommand() {
     private val configure: Boolean by option().flag("--reset", default = true).help("Configures the device for tests (disable animations)")
-    private val immersiveMode: Boolean by option().flag().help("Also sets the `immersive_mode_confirmation` confirmation when configuring")
+    private val immersiveMode: Boolean by option().flag().help("Also sets the `immersive_mode_confirmations` confirmation when configuring")
     private val resetAutofill: Boolean by option().flag().help("Also sets the `autofill_service` to null when configuring")
     private val touches: Boolean by option().flag().help("Also enables touches when configuring for tests (`--reset` will disable again)")
     private val unlock: Boolean by option().flag().help("Attempts to unlock the device by sending (`keyevent 82`)")
@@ -82,12 +82,12 @@ class Test : AdbCommand() {
 
                 if (configure && immersiveMode) {
                     adb.execute(
-                        request = ShellCommandRequest("settings put secure immersive_mode_confirmation confirmed"), serial = device.serial
+                        request = ShellCommandRequest("settings put secure immersive_mode_confirmations confirmed"), serial = device.serial
                     ).errorOutput.trim().takeIf { it.isNotBlank() }?.let {
                         completeSuccess = false
                         echo("  ⚠\uFE0F Failed to set immersive mode ($it)")
                     } ?: run {
-                        val validate = adb.execute(request = ShellCommandRequest("settings get secure immersive_mode_confirmation"), serial = device.serial).output.trim()
+                        val validate = adb.execute(request = ShellCommandRequest("settings get secure immersive_mode_confirmations"), serial = device.serial).output.trim()
                         echo("  ✅ Immersive mode `$validate`.")
                     }
                 }
