@@ -23,7 +23,7 @@ internal val TEST_CONFIGURATION_TOOL_INPUT = ToolSchema(
         })
         put("immersiveMode", buildJsonObject {
             put("type", JsonPrimitive("boolean"))
-            put("description", JsonPrimitive("Whether to set the immersive_mode_confirmation on the device when configuring"))
+            put("description", JsonPrimitive("Whether to set the immersive_mode_confirmations on the device when configuring"))
             put("default", JsonPrimitive(false))
         })
         put("resetAutofill", buildJsonObject {
@@ -189,7 +189,7 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
         // Apply immersive mode if requested
         if (immersiveMode) {
             val response = adb.execute(
-                request = ShellCommandRequest("settings put secure immersive_mode_confirmation confirmed"),
+                request = ShellCommandRequest("settings put secure immersive_mode_confirmations confirmed"),
                 serial = serial
             )
 
@@ -204,7 +204,7 @@ fun createTestConfigurationTool(adb: AndroidDebugBridgeClient): RegisteredTool =
                 })
             } else {
                 val validate = adb.execute(
-                    request = ShellCommandRequest("settings get secure immersive_mode_confirmation"),
+                    request = ShellCommandRequest("settings get secure immersive_mode_confirmations"),
                     serial = serial
                 ).output.trim()
 
