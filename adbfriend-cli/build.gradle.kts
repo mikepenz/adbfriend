@@ -34,6 +34,11 @@ application {
     applicationName = "adbfriend-cli"
     mainClass = "com.mikepenz.adbfriend.MainKt"
     version = property("VERSION_NAME").toString()
+    applicationDefaultJvmArgs = listOf("--enable-native-access=ALL-UNNAMED")
+}
+
+tasks.named<JavaExec>("run") {
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
 }
 
 buildConfig {
@@ -53,5 +58,8 @@ tasks.named("shadowJar", ShadowJar::class.java) {
     minimize {
         exclude(dependency("com.github.ajalt.mordant:.*:.*"))
         exclude(dependency("org.slf4j:.*:.*"))
+    }
+    manifest {
+        attributes("Enable-Native-Access" to "ALL-UNNAMED")
     }
 }
