@@ -91,7 +91,7 @@ fun usbProtocolParser(usbProtocolString: String = DEMO_STRING): List<UsbInformat
                 speed = trimmedLine.substring(SPEED.length)
             }
             if (serial.isNullOrBlank().not() && speed.isNullOrBlank().not()) {
-                usbInformation.add(UsbInformation(serial!!, speed!!))
+                usbInformation.add(UsbInformation(serial, speed))
             }
         } else {
             serial = null
