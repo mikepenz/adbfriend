@@ -1,7 +1,7 @@
 [versions]
 adam = "0.5.10"
 clikt = "5.1.0"
-mordant = "3.0.2"
+mordant = "3.1.0"
 slf4j = "2.0.18"
 shadow = "9.6.1"
 buildconfig = "6.0.10"
