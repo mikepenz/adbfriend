@@ -7,7 +7,7 @@ shadow = "9.6.1"
 buildconfig = "6.1.2"
 mcp = "0.15.0"
 kotlinx-io = "0.9.1"
-ktor = "3.6.0"
+ktor = "3.6.1"
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
