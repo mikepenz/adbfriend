@@ -15,9 +15,9 @@ import kotlinx.io.buffered
 suspend fun setupServer(sseOptions: SseOptions?, builtTools: List<RegisteredTool>, echo: (String) -> Unit, enableLog: Boolean = false) {
     val server = configureServer(builtTools)
     if (sseOptions?.sse == true) {
-        if (enableLog) echo("Starting SSE MCP server on port ${sseOptions.port}")
+        if (enableLog) echo("Starting Streamable HTTP MCP server on port ${sseOptions.port}")
         embeddedServer(Netty, host = "0.0.0.0", port = sseOptions.port) {
-            mcp {
+            mcpStreamableHttp {
                 server
             }
         }.start(wait = true)
